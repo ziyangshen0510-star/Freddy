@@ -121,7 +121,7 @@ with sync_playwright() as p:
     page.wait_for_function('window.littlePuppy !== undefined')
     expect(page.locator('#pet-name')).to_have_text('宝宝的小黑')
     expect(page.locator('#action-sleep')).to_have_attribute('aria-pressed','true')
-    assert page.evaluate('caches.keys()')==['kali-little-dog-v4']
+    assert page.evaluate('caches.keys()')==['kali-little-dog-v5']
     page.locator('#action-sleep').click()
     page.wait_for_function('littlePuppy.inspect().state !== "sleeping"')
     ctx.set_offline(False)
@@ -147,12 +147,12 @@ with sync_playwright() as p:
     o.wait_for_function('navigator.serviceWorker.controller !== null')
     Handler.old_worker=False
     o.evaluate('navigator.serviceWorker.getRegistration().then(r=>r.update())')
-    o.wait_for_function('caches.keys().then(k=>k.includes("kali-little-dog-v4")&&!k.includes("kali-little-dog-v2"))')
+    o.wait_for_function('caches.keys().then(k=>k.includes("kali-little-dog-v5")&&!k.includes("kali-little-dog-v2"))')
     o.reload(wait_until='networkidle')
     expect(o.locator('#pet-name')).to_have_text('原来的小黑')
     preserved=o.evaluate(f'JSON.parse(localStorage.getItem("{key}"))')
     assert preserved['bornAt']==birth and preserved['affection']==40 and preserved['memories'][0]['text']=='和宝宝相处的记录。'
-    checks.append('v2 to v4 upgrade preserves name, birthday, affection and memories')
+    checks.append('v2 to v5 upgrade preserves name, birthday, affection and memories')
 
     old.close()
 

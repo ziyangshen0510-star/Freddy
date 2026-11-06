@@ -289,6 +289,11 @@ function createWorld() {
   let wagFrequency = 7;
   let wagAmplitude = .25;
   let bodyLean = 0;
+  let roomNight = 0;
+  let roomPeach = 0;
+  const daylightColor = new THREE.Color(0xffedd4);
+  const moonlightColor = new THREE.Color(0xc7d7ee);
+  const sunsetColor = new THREE.Color(0xffc8a0);
   const pose = { crouch: 0, nuzzle: 0, feeding: 0, excitement: .3 };
   const previousPosition = V();
   const home = V(0, 0, 0);
@@ -513,8 +518,11 @@ function createWorld() {
       ball.rotation.x += dt * .4;
     }
     if (!action && !draggingBall) ball.position.lerp(ballHome, Math.min(1, dt * 5));
-    hemisphere.intensity = mix(2.2, 1.55, sleepBlend);
-    light.intensity = mix(4.1, 1.8, sleepBlend);
+    roomNight = THREE.MathUtils.damp(roomNight, room.dataset.roomTheme === 'night' ? 1 : 0, 4, dt);
+    roomPeach = THREE.MathUtils.damp(roomPeach, room.dataset.roomTheme === 'peach' ? 1 : 0, 4, dt);
+    hemisphere.intensity = mix(mix(2.2, 1.65, roomNight), 1.55, sleepBlend);
+    light.intensity = mix(mix(4.1, 2.4, roomNight), 1.8, sleepBlend);
+    light.color.copy(daylightColor).lerp(moonlightColor, roomNight).lerp(sunsetColor, roomPeach * .65);
     projectProxy(ball, proxies[1]);projectProxy(bowl, proxies[0]);
   }
 

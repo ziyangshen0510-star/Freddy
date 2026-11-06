@@ -18,6 +18,37 @@
   let cancelFallback;
   let soundEnabled = false;
   let audio;
+  let lastSpeechAt = 0;
+  let speechTurn = 0;
+
+  function choose(lines, salt = 0) {
+    const date = new Date();
+    const day = date.getFullYear() * 372 + date.getMonth() * 31 + date.getDate();
+    const quarterHour = Math.floor(Date.now() / 900000);
+    return lines[(day + quarterHour + salt) % lines.length];
+  }
+
+  function say(text) {
+    const node = $('#pet-speech');
+    node.textContent = text;
+    lastSpeechAt = Date.now();
+  }
+
+  function updateCompanionCopy() {
+    const hour = new Date().getHours();
+    const greetings = hour >= 5 && hour < 11 ? ['早安，宝宝。', '早安，来摸摸小黑。', '新的一天，一起慢慢来。']
+      : hour < 14 && hour >= 11 ? ['午安，宝宝。', '午间也想和你贴贴。', '休息一下，小黑在呢。']
+      : hour < 18 && hour >= 14 ? ['下午好，来坐坐吧。', '把下午留一点给小黑。', '今天，也陪宝宝一下。']
+      : hour >= 18 && hour < 22 ? ['晚上好，宝宝。', '今天辛苦啦，抱抱小黑。', '晚上也有小狗陪你。']
+      : ['夜里，小黑陪着你。', '晚安，宝宝。', '不着急，慢慢休息吧。'];
+    $('#pet-greeting').textContent = choose(greetings, 2);
+    $('#greeting-eyebrow').textContent = choose(['慢慢相处，不赶时间', '有空来坐坐就好', '每一天，多一点喜欢', '今天也给你留了位置'], 7);
+    const titles = pet.affection >= 50 ? ['一见到宝宝，尾巴就开始摇。', '最喜欢的脚步声，是宝宝来了。', '熟悉的陪伴，每天多一点。']
+      : pet.affection >= 15 ? ['喜欢宝宝，已经藏不住啦。', '又多了一点属于我们的默契。', '今天的小开心，是见到你。']
+      : ['今天，也是被喜欢的小狗。', '慢慢熟悉，也慢慢长大。', '小狗把今天的位置留给你。'];
+    $('#affection-heading').textContent = choose(titles, 11);
+    $('#affection-copy').textContent = choose(['不需要打卡，有空来看看就很好。', '摸摸头，就是今天的小确幸。', '不用做什么，坐在一起也很好。', '小日子不用很热闹，有你就好。', '有一点点时间，就陪小黑发发呆。', '窗边有光，小窝里有个位置给你。'], 17);
+  }
 
   function showToast(message) {
     clearTimeout(toastTimer);
@@ -114,10 +145,10 @@
   }
 
   function defaultSpeech() {
-    if (pet.sleeping) return '呼噜……梦里也有宝宝。';
-    if (pet.hunger < 50) return '宝宝，想吃一口小零食。';
-    if (pet.energy < 40) return '有一点点困，想打个小盹。';
-    return '宝宝，你来啦！摸摸我的头嘛。';
+    if (pet.sleeping) return choose(['呼噜……梦里也有宝宝。', '尾巴也休息啦，正在做个甜甜的梦。', '把脑袋枕好，安安静静睡一会儿。'], speechTurn);
+    if (pet.hunger < 50) return choose(['宝宝，想吃一口小零食。', '闻闻小碗，等宝宝陪我吃一点。', '肚子小声咕噜啦，想吃点东西。'], speechTurn + 3);
+    if (pet.energy < 40) return choose(['有一点点困，想打个小盹。', '玩累啦，想蜷起来休息一下。', '打个小哈欠，宝宝陪我歇会儿吧。'], speechTurn + 5);
+    return choose(['宝宝，你来啦！摸摸我的头嘛。', '把脑袋凑过来，今天也想贴贴。', '刚刚在窗边发呆，现在想陪你玩。', '听见宝宝来了，尾巴就停不下来。', '也可以什么都不做，我们坐一会儿。', '小窝有一点安静，和宝宝待着正好。'], speechTurn + 13);
   }
 
   function memoryTime(time) {
@@ -146,9 +177,7 @@
       $(`#${key}-meter`).setAttribute('aria-valuenow', String(value));
       $(`#${key}-meter>span`).style.width = `${value}%`;
     }
-    const affection = pet.affection;
-    $('#affection-heading').textContent = affection >= 50 ? '是见到宝宝，就会摇尾巴的小狗。' : affection >= 15 ? '喜欢宝宝，已经藏不住啦。' : '今天，也是被喜欢的小狗。';
-    $('#affection-copy').textContent = '不需要打卡，有空来看看就很好。';
+    updateCompanionCopy();
     const list = $('#memory-list');
     list.replaceChildren();
     pet.memories.forEach((item) => {
@@ -210,25 +239,25 @@
       currentAction = null;setBusy(false);
       $('#pet-room').classList.remove('is-stroking', 'is-feeding', 'is-playing');
       pet.sleeping = !pet.sleeping;
-      $('#pet-speech').textContent = pet.sleeping ? '晚安宝宝，小狗先做个甜甜的梦。' : '睡醒啦！第一眼就看到宝宝，真好。';
+      say(pet.sleeping ? '晚安宝宝，小狗先做个甜甜的梦。' : '睡醒啦！第一眼就看到宝宝，真好。');
       remember(pet.sleeping ? `${pet.name}打起了小呼噜。` : `${pet.name}睡醒了，又可以一起玩啦。`);
       render();persist();return;
     }
     if (isBusy) return;
     if (pet.sleeping) {
-      $('#pet-speech').textContent = action === 'stroke' ? '轻轻摸摸……小狗睡得更香啦。' : '小狗在休息，等它醒来再一起玩吧。';
+      say(action === 'stroke' ? '轻轻摸摸……小狗睡得更香啦。' : '小狗在休息，等它醒来再一起玩吧。');
       if (action === 'stroke') hearts();
       render();persist();return;
     }
     if (action === 'feed' && pet.hunger >= 98) {
-      $('#pet-speech').textContent = '肚子已经圆圆啦，先收好零食吧。';liveDog?.cancel();render();persist();return;
+      say('肚子已经圆圆啦，先收好零食吧。');liveDog?.cancel();render();persist();return;
     }
     if (action === 'play' && pet.energy < 30) {
-      $('#pet-speech').textContent = '小狗有点累啦，先陪它睡一小觉吧。';liveDog?.cancel();render();persist();return;
+      say('小狗有点累啦，先陪它睡一小觉吧。');liveDog?.cancel();render();persist();return;
     }
     const token = ++actionToken;
     currentAction = action;setBusy(true);render();
-    $('#pet-speech').textContent = action === 'feed' ? '听见碗里的声音啦，小黑走过去看看。' : action === 'play' ? '准备好啦，宝宝把球抛给我吧！' : options.zone === 'chin' ? '挠挠下巴，舒服得仰起头啦。' : options.zone === 'ear' ? '耳朵也想贴贴宝宝的手。' : '摸摸脑袋，小黑靠过来蹭蹭你。';
+    say(action === 'feed' ? '听见碗里的声音啦，小黑走过去看看。' : action === 'play' ? '准备好啦，宝宝把球抛给我吧！' : options.zone === 'chin' ? '挠挠下巴，舒服得仰起头啦。' : options.zone === 'ear' ? '耳朵也想贴贴宝宝的手。' : '摸摸脑袋，小黑靠过来蹭蹭你。');
     if (action === 'stroke') hearts();
     let completed;
     try {
@@ -248,15 +277,15 @@
         pet.affection = clamp(pet.affection + 3, 0, 9999);
         remember(`宝宝摸了摸${pet.name}，小狗凑过来贴贴。`);lastStrokeAt = Date.now();
       }
-      $('#pet-speech').textContent = '最喜欢宝宝这样摸摸我啦 ♡';
+      say('最喜欢宝宝这样摸摸我啦 ♡');
     } else if (action === 'feed') {
       pet.hunger = clamp(pet.hunger + 22);pet.mood = clamp(pet.mood + 4);pet.affection = clamp(pet.affection + 2, 0, 9999);
       remember(`${pet.name}走到小碗前，认真吃完了零食。`);
-      $('#pet-speech').textContent = '舔舔嘴巴，宝宝给的零食真好吃。';
+      say('舔舔嘴巴，宝宝给的零食真好吃。');
     } else if (action === 'play') {
       pet.mood = clamp(pet.mood + 12);pet.energy = clamp(pet.energy - 9);pet.hunger = clamp(pet.hunger - 3);pet.affection = clamp(pet.affection + 4, 0, 9999);
       remember(`${pet.name}追到球，又叼回来送给了宝宝。`);
-      $('#pet-speech').textContent = '球球叼回来啦，放到宝宝面前！';
+      say('球球叼回来啦，放到宝宝面前！');
     }
     render();persist();
   }
@@ -268,9 +297,10 @@
   room.addEventListener('puppy:ready', (event) => { liveDog = event.detail;render(); });
   room.addEventListener('puppy:pet', (event) => { void interact('stroke', event.detail); });
   room.addEventListener('puppy:throw', (event) => { void interact('play', event.detail); });
-  room.addEventListener('puppy:phase', (event) => { if (currentAction) $('#pet-speech').textContent = event.detail.text; });
+  room.addEventListener('puppy:phase', (event) => { if (currentAction) say(event.detail.text); });
   room.addEventListener('puppy:sound', (event) => playSound(event.detail.kind));
   room.addEventListener('puppy:unavailable', () => { liveDog = null;render(); });
+  room.addEventListener('room:style-saved', (event) => showToast(event.detail?.persisted === false ? '这次布置好啦；当前浏览器无法保存，下次可能恢复默认。' : '小窝布置好啦，下次回来还是这个样子 ♡'));
   $('#food-bowl').addEventListener('click', () => { void interact('feed'); });
   $('#toy-ball').addEventListener('click', (event) => {
     // A captured drag has already emitted its own throw at pointerup.
@@ -316,7 +346,7 @@
     settleTime();
     if (name !== pet.name) remember(`宝宝给小狗取了名字：${name}。`);
     pet.name = name;
-    $('#pet-speech').textContent = `以后就叫${name}啦，宝宝一喊我就到！`;
+    say(`以后就叫${name}啦，宝宝一喊我就到！`);
     render(); persist(); dialog.close();
     showToast('新名字收好啦 ♡');
   });
@@ -342,6 +372,11 @@
 
   function refreshTime() {
     settleTime(); render(); persist();
+    const quiet = !liveDog || ['idle', 'sleeping'].includes(liveDog.inspect().state);
+    if (!document.hidden && !isBusy && quiet && !document.querySelector('dialog[open]') && Date.now() - lastSpeechAt > 120000) {
+      speechTurn += 1;
+      say(defaultSpeech());
+    }
   }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshTime(); });
   setInterval(refreshTime, 60000);
@@ -350,11 +385,11 @@
     if (event.key !== STORAGE_KEY) return;
     pet = loadPet();
     settleTime(); render();
-    $('#pet-speech').textContent = defaultSpeech();
+    say(defaultSpeech());
   });
 
   settleTime(); render(); persist();
-  $('#pet-speech').textContent = defaultSpeech();
+  say(defaultSpeech());
   if ('serviceWorker' in navigator && window.isSecureContext) {
     navigator.serviceWorker.register('./sw.js').catch(() => {
       showToast('暂时没能准备好离线模式，联网时可以正常玩。');
