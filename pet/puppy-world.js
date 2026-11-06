@@ -7,6 +7,8 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 const clamp = THREE.MathUtils.clamp;
 const mix = THREE.MathUtils.lerp;
 const smooth = (t) => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
+const wrapAngle = (angle) => Math.atan2(Math.sin(angle), Math.cos(angle));
+const easeSwing = (t) => t * t * t * (t * (t * 6 - 15) + 10);
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 const emit = (name, detail) => room.dispatchEvent(new CustomEvent(`puppy:${name}`, { detail }));
 
@@ -81,7 +83,15 @@ function createWorld() {
     return mesh;
   }
   function bone(parent, material, length, radius) {
-    const mesh = new THREE.Mesh(capsule, material);
+    const geometry = capsule.clone();
+    const vertices = geometry.attributes.position;
+    for (let i = 0; i < vertices.count; i += 1) {
+      const taper = .79 + .27 * (vertices.getY(i) / 3 + .5);
+      vertices.setX(i, vertices.getX(i) * taper);
+      vertices.setZ(i, vertices.getZ(i) * taper);
+    }
+    geometry.computeVertexNormals();
+    const mesh = new THREE.Mesh(geometry, material);
     mesh.scale.set(radius, length / 3, radius);
     mesh.position.y = -length / 2;
     mesh.castShadow = true;
@@ -126,8 +136,8 @@ function createWorld() {
   const head = new THREE.Group();
   head.position.set(0, 1.65, .62);
   dog.add(head);
-  ellipsoid(head, fur, V(0, .02, 0), V(.43, .43, .43), 'head');
-  coat(head, V(0, .02, 0), V(.43, .43, .43), 850);
+  ellipsoid(head, fur, V(0, .02, 0), V(.445, .40, .455), 'head');
+  coat(head, V(0, .02, 0), V(.445, .40, .455), 850);
   // Cheeks merge into a wide Labrador muzzle instead of a flat face.
   ellipsoid(head, muzzleMaterial, V(-.13, -.16, .33), V(.225, .16, .255), 'chin');
   ellipsoid(head, muzzleMaterial, V(.13, -.16, .33), V(.225, .16, .255), 'chin');
@@ -194,8 +204,9 @@ function createWorld() {
   for (const front of [true, false]) for (const side of [-1, 1]) {
     const upper = new THREE.Group();
     dog.add(upper);
-    bone(upper, fur, .43, front ? .11 : .14);
-    ellipsoid(upper, fur, V(0, -.37, 0), V(.10, .12, .10));
+    bone(upper, fur, .43, front ? .12 : .15);
+    ellipsoid(upper, fur, V(0, -.09, -.015), front ? V(.17, .23, .18) : V(.22, .27, .24));
+    ellipsoid(upper, fur, V(0, -.37, 0), V(.10, .115, .10));
     const lower = new THREE.Group();
     lower.position.y = -.43;
     upper.add(lower);
@@ -269,6 +280,17 @@ function createWorld() {
   let visible = true;
   let disposed = false;
   let currentYaw = .32;
+  let frameDt = 1 / 30;
+  let turnTarget = 0;
+  let travelSpeed = 0;
+  let gaitBlend = 0;
+  let runBlend = 0;
+  let tailPhase = 0;
+  let wagFrequency = 7;
+  let wagAmplitude = .25;
+  let bodyLean = 0;
+  const pose = { crouch: 0, nuzzle: 0, feeding: 0, excitement: .3 };
+  const previousPosition = V();
   const home = V(0, 0, 0);
   const ballHome = V(1.12, .115, .62);
   const raycaster = new THREE.Raycaster();
@@ -306,12 +328,16 @@ function createWorld() {
     return new Promise((resolve) => { pending = resolve; });
   }
   function walk(from, to, u) {
-    dog.position.lerpVectors(from, to, smooth(u));
+    dog.position.lerpVectors(from, to, smooth(clamp((u - .06) / .94, 0, 1)));
     const delta = to.clone().sub(from);
-    if (delta.lengthSq() > .005) currentYaw = THREE.MathUtils.damp(currentYaw, Math.atan2(delta.x, delta.z), 9, .016);
+    if (delta.lengthSq() > .005) {
+      const difference = wrapAngle(Math.atan2(delta.x, delta.z) - currentYaw);
+      turnTarget = difference;
+      currentYaw += clamp(difference * (1 - Math.exp(-9 * frameDt)), -3.8 * frameDt, 3.8 * frameDt);
+    }
   }
   function moveLeg(leg, stride, lift, crouch, sleeping) {
-    const hipY = leg.front ? .91 - crouch * .27 - sleeping * .52 : .90 - sitBlend * .27 - sleeping * .42;
+    const hipY = leg.front ? .875 - crouch * .25 - sleeping * .485 : .88 - sitBlend * .25 - sleeping * .42;
     leg.upper.position.set(leg.side * (leg.front ? .285 : .32), hipY, leg.front ? .41 : -.48);
     const footZ = (leg.front ? .49 + sleeping * .60 : -.49 + sitBlend * .15) + stride;
     const footY = .085 + lift;
@@ -333,6 +359,9 @@ function createWorld() {
   }
 
   function update(dt) {
+    frameDt = dt;
+    turnTarget = 0;
+    previousPosition.copy(dog.position);
     elapsed += dt;
     if (action) action.time += dt;
     sleepBlend = THREE.MathUtils.damp(sleepBlend, sleepTarget ? 1 : 0, 3, dt);
@@ -354,7 +383,7 @@ function createWorld() {
         excitement = .45;targetSit = 0;
         if (t < 1.1) { walk(action.start, action.target, t / 1.1);gait = .6; }
         else if (t < 3.8) {
-          currentYaw = THREE.MathUtils.damp(currentYaw, 0, 8, dt);
+          currentYaw += clamp(wrapAngle(-currentYaw) * (1 - Math.exp(-8 * dt)), -3.8 * dt, 3.8 * dt);
           crouch = smooth((t - 1.1) / .6) * (1 - smooth((t - 3.3) / .5));
           feeding = t > 1.6 && t < 3.2 ? 1 : 0;
           kibble.forEach((pellet, i) => { pellet.visible = i >= Math.floor(Math.max(0, t - 1.6) * 9); });
@@ -379,7 +408,7 @@ function createWorld() {
         if (t >= 2.1 && t < 2.65) crouch = Math.sin((t - 2.1) / .55 * Math.PI) * .65;
         carrying = t >= 2.45 && t < 4.7;
         if (t >= 2.65 && t < 4.35) { walk(action.fetchPoint, home, (t - 2.65) / 1.7);gait = .85; }
-        if (t >= 4.35) currentYaw = THREE.MathUtils.damp(currentYaw, .32, 8, dt);
+        if (t >= 4.35) currentYaw += clamp(wrapAngle(.32 - currentYaw) * (1 - Math.exp(-8 * dt)), -3.8 * dt, 3.8 * dt);
         if (t >= 4.7) {
           const u = smooth((t - 4.7) / .65);
           const mouth = head.localToWorld(V(0, -.22, .67));
@@ -401,61 +430,88 @@ function createWorld() {
       }
     }
     if (!action && !sleepTarget) {
-      currentYaw = THREE.MathUtils.damp(currentYaw, .32, 4, dt);
+      currentYaw += clamp(wrapAngle(.32 - currentYaw) * (1 - Math.exp(-4 * dt)), -3.8 * dt, 3.8 * dt);
       if (!reduce.matches && elapsed > nextWander && !grab) {
         nextWander = elapsed + 15 + random() * 9;
         void begin('wander', { target: V((random() - .5) * 1.25, 0, -.2 - random() * .3) });
       }
     }
-    if (reduce.matches) gait = 0;
+    const distance = dog.position.distanceTo(previousPosition);
+    const speed = distance / Math.max(dt, .001);
+    travelSpeed = THREE.MathUtils.damp(travelSpeed, speed, 9, dt);
+    gaitBlend = THREE.MathUtils.damp(gaitBlend, reduce.matches ? 0 : clamp(travelSpeed / .85, 0, 1), 10, dt);
+    runBlend = THREE.MathUtils.damp(runBlend, smooth((travelSpeed - .65) / .75), 6, dt);
+    gait = gaitBlend;
+    for (const name of ['crouch', 'nuzzle', 'feeding', 'excitement']) {
+      const target = ({ crouch, nuzzle, feeding, excitement })[name];
+      pose[name] = THREE.MathUtils.damp(pose[name], target, name === 'feeding' ? 12 : 9, dt);
+    }
+    crouch = pose.crouch;nuzzle = pose.nuzzle;feeding = pose.feeding;excitement = pose.excitement;
     sitBlend = THREE.MathUtils.damp(sitBlend, targetSit, 5, dt);
     const breath = reduce.matches ? 0 : Math.sin(elapsed * 2.1) * .009;
-    body.position.set(0, .98 - sitBlend * .08 - sleepBlend * .52 - crouch * .10, -.06);
+    phase += reduce.matches ? 0 : distance / .46 * Math.PI * 2;
+    const weightShift = Math.sin(phase * 2) * .009 * gait;
+    bodyLean = THREE.MathUtils.damp(bodyLean, clamp(-turnTarget * .045, -.10, .10) * gait, 7, dt);
+    body.position.set(0, .98 - sitBlend * .08 - sleepBlend * .52 - crouch * .10 + weightShift, -.06);
     body.rotation.x = -sitBlend * .38 + sleepBlend * .38;
+    body.rotation.z = bodyLean;
     body.scale.y = 1 + breath;
-    chest.position.y = 1.02 - sleepBlend * .57 - crouch * .26;
+    chest.position.y = 1.02 - sleepBlend * .57 - crouch * .26 + weightShift;
     neck.position.y = 1.40 - sleepBlend * .78 - crouch * .56;
-    head.position.y = 1.65 - sleepBlend * 1.16 - crouch * .79;
+    head.position.y = 1.65 - sleepBlend * 1.16 - crouch * .79 + weightShift * .65;
     head.position.z = .62 + sleepBlend * .21 + nuzzle * .04;
     const pointerYaw = pointer.active ? pointer.x * .55 : reduce.matches ? 0 : Math.sin(elapsed * .43) * .07;
-    head.rotation.y = THREE.MathUtils.damp(head.rotation.y, (pointerYaw - (gait ? 0 : currentYaw * .35)) * (1 - sleepBlend), 6, dt);
-    head.rotation.x = crouch * .74 + sleepBlend * .10 + (pointer.active ? pointer.y * .15 : 0) + nuzzle * (action?.zone === 'chin' ? -.25 : -.12);
-    head.rotation.z = nuzzle * (action?.zone === 'ear' ? -.20 : .13) + (reduce.matches ? 0 : Math.sin(elapsed * .67) * .025) * (1 - sleepBlend);
+    head.rotation.y = THREE.MathUtils.damp(head.rotation.y, (pointerYaw - (gait > .1 ? 0 : wrapAngle(currentYaw) * .35) + clamp(turnTarget * .16, -.25, .25)) * (1 - sleepBlend), 6, dt);
+    head.rotation.x = THREE.MathUtils.damp(head.rotation.x, crouch * .74 + sleepBlend * .10 + (pointer.active ? pointer.y * .15 : 0) + nuzzle * (action?.zone === 'chin' ? -.25 : -.12), 10, dt);
+    head.rotation.z = THREE.MathUtils.damp(head.rotation.z, nuzzle * (action?.zone === 'ear' ? -.20 : .13) + (reduce.matches ? 0 : Math.sin(elapsed * .67) * .025) * (1 - sleepBlend), 10, dt);
     collar.position.y = 1.38 - sleepBlend * .77 - crouch * .49;
     bib.position.y = 1.34 - sleepBlend * .76 - crouch * .47;
     knot.position.y = 1.38 - sleepBlend * .77 - crouch * .49;
     scarfEnd.position.y = 1.29 - sleepBlend * .77 - crouch * .49;
-    phase += dt * (3 + gait * 10);
     for (let i = 0; i < legs.length; i += 1) {
       const leg = legs[i];
-      const legPhase = phase + ((leg.front && leg.side === -1) || (!leg.front && leg.side === 1) ? 0 : Math.PI);
-      moveLeg(leg, Math.sin(legPhase) * .20 * gait, Math.max(0, Math.cos(legPhase)) * .16 * gait, crouch, sleepBlend);
+      const walkingOffset = [0, .5, .75, .25][i];
+      const runningOffset = [0, .5, .5, 0][i];
+      const cycle = ((phase / (Math.PI * 2) + mix(walkingOffset, runningOffset, runBlend)) % 1 + 1) % 1;
+      const stance = cycle < .62;
+      const swing = clamp((cycle - .62) / .38, 0, 1);
+      const step = stance ? mix(.16, -.16, cycle / .62) : mix(-.16, .16, easeSwing(swing));
+      const lift = stance ? 0 : Math.sin(Math.PI * swing) ** 2 * mix(.085, .13, runBlend);
+      moveLeg(leg, step * gait, lift * gait, crouch, sleepBlend);
     }
     if (!reduce.matches && elapsed > nextBlink) { blinkStart = elapsed;nextBlink = elapsed + 2.8 + random() * 3; }
     const blink = clamp(Math.sin(clamp((elapsed - blinkStart) / .24, 0, 1) * Math.PI), 0, 1);
     for (const eye of eyes) eye.scale.y = Math.max(.045, (1 - blink * .95) * (1 - sleepBlend * .96) * (1 - nuzzle * .45));
-    jaw.rotation.x = (carrying ? .18 : .075 + (reduce.matches ? 0 : Math.sin(elapsed * 5) * .018)) * (1 - sleepBlend) + feeding * (.05 + Math.max(0, Math.sin(elapsed * 23)) * .16);
+    const jawTarget = (carrying ? .18 : .075 + (reduce.matches ? 0 : Math.sin(elapsed * 5) * .018)) * (1 - sleepBlend) + feeding * (.05 + Math.max(0, Math.sin(elapsed * 23)) * .16);
+    jaw.rotation.x = THREE.MathUtils.damp(jaw.rotation.x, jawTarget, 14, dt);
     tongue.visible = !carrying && sleepBlend < .5;
     tongueLine.visible = tongue.visible;
     tongue.scale.z = .145 * (1 + nuzzle * .35);
     for (let i = 0; i < ears.length; i += 1) {
       const side = i === 0 ? -1 : 1;
-      ears[i].rotation.z = side * -.13 + (reduce.matches ? 0 : Math.sin(phase + i) * .05 * gait) + nuzzle * side * .09;
-      ears[i].rotation.x = nuzzle * -.08 + (reduce.matches ? 0 : Math.sin(elapsed * 1.3 + i) * .02);
+      ears[i].rotation.z = THREE.MathUtils.damp(ears[i].rotation.z, side * -.13 + (reduce.matches ? 0 : Math.sin(phase + i * 1.7) * .045 * gait) + nuzzle * side * .09 - bodyLean * .4, 9, dt);
+      ears[i].rotation.x = THREE.MathUtils.damp(ears[i].rotation.x, nuzzle * -.08 + (reduce.matches ? 0 : Math.sin(elapsed * 1.3 + i) * .02), 7, dt);
     }
+    wagFrequency = THREE.MathUtils.damp(wagFrequency, 5 + excitement * 7, 5, dt);
+    wagAmplitude = THREE.MathUtils.damp(wagAmplitude, (.18 + excitement * .25) * (1 - sleepBlend), 6, dt);
+    if (!reduce.matches) tailPhase += dt * wagFrequency;
     for (let i = 0; i < tail.length; i += 1) {
-      tail[i].rotation.y = reduce.matches ? 0 : Math.sin(elapsed * (5 + excitement * 7) - i * .35) * (.18 + excitement * .25) * (1 - sleepBlend);
+      tail[i].rotation.y = reduce.matches ? 0 : Math.sin(tailPhase - i * .35) * wagAmplitude;
       tail[i].rotation.x = mix(.15 + i * .045, i === 0 ? -.42 : 0, sleepBlend);
       if (i > 0) tail[i].position.y = .035 * (1 - sleepBlend);
     }
     tail[0].position.y = body.position.y + .10 * Math.cos(body.rotation.x) + .64 * Math.sin(body.rotation.x);
     tail[0].position.z = body.position.z + .10 * Math.sin(body.rotation.x) - .64 * Math.cos(body.rotation.x);
     dog.rotation.y = currentYaw;
-    dog.position.y = reduce.matches ? 0 : Math.abs(Math.sin(phase)) * gait * .025;
+    dog.position.y = 0;
     shadow.position.x = dog.position.x;shadow.position.z = dog.position.z;
     shadow.scale.y = mix(.83, 1, 1 - sitBlend);
     dog.updateMatrixWorld(true);
-    if (carrying) { ball.position.copy(head.localToWorld(V(0, -.22, .68)));ball.rotation.x += dt * .4; }
+    if (carrying) {
+      action.pickupStart ||= ball.position.clone();
+      ball.position.lerpVectors(action.pickupStart, head.localToWorld(V(0, -.22, .68)), smooth((action.time - 2.45) / .24));
+      ball.rotation.x += dt * .4;
+    }
     if (!action && !draggingBall) ball.position.lerp(ballHome, Math.min(1, dt * 5));
     hemisphere.intensity = mix(2.2, 1.55, sleepBlend);
     light.intensity = mix(4.1, 1.8, sleepBlend);
@@ -546,7 +602,7 @@ function createWorld() {
     },
     sleep(value) { if (value === sleepTarget) return;finish(false);sleepTarget = value;draggingBall = false;grab = null;nextWander = elapsed + 8;if (stageLabel) stageLabel.textContent = value ? '小狗在做梦' : '会动的小黑 · 可以摸摸它'; },
     cancel() { finish(false);draggingBall = false;ball.position.copy(ballHome); },
-    inspect() { return { state: sleepTarget ? 'sleeping' : action?.kind || 'idle', time: elapsed, phase: action?.time || 0, position: dog.position.toArray(), head: head.rotation.toArray().slice(0, 3), headScreen: head.getWorldPosition(V()).project(camera).toArray(), tail: tail[0].rotation.y, leg: legs[0].upper.rotation.x, ball: ball.position.toArray(), mouth: head.localToWorld(V(0, -.22, .68)).toArray(), eyes: eyes[0].scale.y, framesPaused: !visible || document.hidden, reducedMotion: reduce.matches }; },
+    inspect() { return { state: sleepTarget ? 'sleeping' : action?.kind || 'idle', time: elapsed, phase: action?.time || 0, position: dog.position.toArray(), yaw: currentYaw, speed: travelSpeed, gait: gaitBlend, pawHeights: legs.map((leg) => leg.paw.getWorldPosition(V()).y), head: head.rotation.toArray().slice(0, 3), headScreen: head.getWorldPosition(V()).project(camera).toArray(), tail: tail[0].rotation.y, leg: legs[0].upper.rotation.x, ball: ball.position.toArray(), mouth: head.localToWorld(V(0, -.22, .68)).toArray(), eyes: eyes[0].scale.y, framesPaused: !visible || document.hidden, reducedMotion: reduce.matches }; },
   };
   renderer.domElement.addEventListener('webglcontextlost', (event) => {
     event.preventDefault();finish(false);room.classList.remove('has-live-dog');emit('unavailable', {});

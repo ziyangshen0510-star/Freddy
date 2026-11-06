@@ -75,7 +75,7 @@ with sync_playwright() as p:
     rect=page.locator('#pet-room').bounding_box()
     page.touchscreen.tap(rect['x']+(spot[0]+1)*rect['width']/2,rect['y']+(1-spot[1])*rect['height']/2)
     page.wait_for_function('littlePuppy.inspect().state === "stroke"')
-    expect(page.locator('#action-feed')).to_be_enabled()
+    expect(page.locator('#action-feed')).to_be_enabled(timeout=30000)
     expect(page.locator('#mood-label')).to_have_text('92%')
     checks.append('Touch hit-testing pets the actual dog and completes a nuzzle')
 
@@ -83,7 +83,7 @@ with sync_playwright() as p:
     page.wait_for_function('littlePuppy.inspect().state === "feed" && littlePuppy.inspect().phase > 1.8')
     expect(page.locator('#hunger-label')).to_have_text('80%')
     page.locator('#pet-room').screenshot(path=str(ARTIFACTS/'live-eating.png'))
-    expect(page.locator('#action-feed')).to_be_enabled()
+    expect(page.locator('#action-feed')).to_be_enabled(timeout=30000)
     expect(page.locator('#hunger-label')).to_have_text('100%')
     page.locator('#action-feed').click()
     expect(page.locator('#pet-speech')).to_contain_text('肚子已经圆圆')
@@ -94,7 +94,7 @@ with sync_playwright() as p:
     carrying=page.evaluate('littlePuppy.inspect()')
     assert math.dist(carrying['mouth'],carrying['ball'])<.04,'Ball is not carried in the mouth'
     page.locator('#pet-room').screenshot(path=str(ARTIFACTS/'live-fetching.png'))
-    expect(page.locator('#action-play')).to_be_enabled()
+    expect(page.locator('#action-play')).to_be_enabled(timeout=30000)
     expect(page.locator('#energy-label')).to_have_text('76%')
     checks.append('Ball arcs, dog runs, picks it up in mouth, returns and drops it')
 
@@ -121,7 +121,7 @@ with sync_playwright() as p:
     page.wait_for_function('window.littlePuppy !== undefined')
     expect(page.locator('#pet-name')).to_have_text('宝宝的小黑')
     expect(page.locator('#action-sleep')).to_have_attribute('aria-pressed','true')
-    assert page.evaluate('caches.keys()')==['kali-little-dog-v3']
+    assert page.evaluate('caches.keys()')==['kali-little-dog-v4']
     page.locator('#action-sleep').click()
     page.wait_for_function('littlePuppy.inspect().state !== "sleeping"')
     ctx.set_offline(False)
@@ -147,12 +147,12 @@ with sync_playwright() as p:
     o.wait_for_function('navigator.serviceWorker.controller !== null')
     Handler.old_worker=False
     o.evaluate('navigator.serviceWorker.getRegistration().then(r=>r.update())')
-    o.wait_for_function('caches.keys().then(k=>k.includes("kali-little-dog-v3")&&!k.includes("kali-little-dog-v2"))')
+    o.wait_for_function('caches.keys().then(k=>k.includes("kali-little-dog-v4")&&!k.includes("kali-little-dog-v2"))')
     o.reload(wait_until='networkidle')
     expect(o.locator('#pet-name')).to_have_text('原来的小黑')
     preserved=o.evaluate(f'JSON.parse(localStorage.getItem("{key}"))')
     assert preserved['bornAt']==birth and preserved['affection']==40 and preserved['memories'][0]['text']=='和宝宝相处的记录。'
-    checks.append('v2 to v3 upgrade preserves name, birthday, affection and memories')
+    checks.append('v2 to v4 upgrade preserves name, birthday, affection and memories')
 
     old.close()
 

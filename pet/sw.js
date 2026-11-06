@@ -1,8 +1,8 @@
 'use strict';
 
-const CACHE = 'kali-little-dog-v3';
+const CACHE = 'kali-little-dog-v4';
 // Resolve relative to the worker so hosting under a GitHub Pages subpath works.
-const ASSETS = ['./', './index.html', './pet.css?v=3', './pet.js?v=3', './puppy-world.bundle.js?v=3', './manifest.webmanifest', './icon-192.png', './icon-512.png', './puppy-awake.png', './puppy-asleep.png', '../styles.css?v=3', '../assets/paw.svg'].map((url) => new URL(url, self.location.href).href);
+const ASSETS = ['./', './index.html', './pet.css?v=4', './pet.js?v=4', './puppy-world.bundle.js?v=4', './manifest.webmanifest', './icon-192.png', './icon-512.png', './puppy-awake.png', './puppy-asleep.png', '../styles.css?v=4', '../assets/paw.svg'].map((url) => new URL(url, self.location.href).href);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS.map((url) => new Request(url, { cache: 'reload' })))).then(() => self.skipWaiting()));

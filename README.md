@@ -41,3 +41,5 @@ python3 scripts/export-offline.py
 ## 发布
 
 静态文件已配置发布到此仓库的 `gh-pages` 分支，GitHub Pages 会自动构建。推送成功不等于部署成功；应检查 GitHub Actions 的 Pages 发布任务。
+
+逐步改进记录与后续计划见 [UPGRADE_PLAN.md](docs/UPGRADE_PLAN.md)。目前没有配置后台每日自动升级。
