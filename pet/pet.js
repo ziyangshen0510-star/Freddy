@@ -12,6 +12,12 @@
   let installPrompt;
   let storageAvailable = true;
   let lastStrokeAt = 0;
+  let liveDog = window.littlePuppy || null;
+  let currentAction = null;
+  let actionToken = 0;
+  let cancelFallback;
+  let soundEnabled = false;
+  let audio;
 
   function showToast(message) {
     clearTimeout(toastTimer);
@@ -19,6 +25,46 @@
     $('#toast').hidden = false;
     toastTimer = setTimeout(() => { $('#toast').hidden = true; }, 3500);
   }
+
+  function playSound(kind) {
+    if (!soundEnabled || document.hidden) return;
+    try {
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) return;
+      audio ||= new Context();
+      if (audio.state === 'suspended') void audio.resume().catch(() => {});
+      const now = audio.currentTime;
+      const gain = audio.createGain();
+      gain.connect(audio.destination);
+      if (kind === 'crunch') {
+        const buffer = audio.createBuffer(1, audio.sampleRate * .16, audio.sampleRate);
+        const samples = buffer.getChannelData(0);
+        for (let i = 0; i < samples.length; i += 1) samples[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audio.sampleRate * .035));
+        const source = audio.createBufferSource();source.buffer = buffer;
+        const filter = audio.createBiquadFilter();filter.type = 'bandpass';filter.frequency.value = 1400;filter.Q.value = .7;
+        gain.gain.value = .11;source.connect(filter);filter.connect(gain);source.start();
+        source.onended = () => { source.disconnect();filter.disconnect();gain.disconnect(); };
+      } else {
+        const oscillator = audio.createOscillator();
+        oscillator.type = kind === 'happy' ? 'triangle' : 'sine';
+        oscillator.frequency.setValueAtTime(kind === 'happy' ? 190 : kind === 'throw' ? 500 : 170, now);
+        oscillator.frequency.exponentialRampToValueAtTime(kind === 'happy' ? 115 : 80, now + .16);
+        gain.gain.setValueAtTime(0, now);gain.gain.linearRampToValueAtTime(.035, now + .015);gain.gain.exponentialRampToValueAtTime(.001, now + .22);
+        oscillator.connect(gain);oscillator.start(now);oscillator.stop(now + .24);
+        oscillator.onended = () => { oscillator.disconnect();gain.disconnect(); };
+      }
+    } catch { /* Audio must never block care or animations. */ }
+  }
+
+  $('#pet-sound-toggle').addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    $('#pet-sound-toggle').setAttribute('aria-pressed', String(soundEnabled));
+    $('#pet-sound-toggle').setAttribute('aria-label', soundEnabled ? '关闭小狗音效' : '开启小狗音效');
+    $('#pet-sound-toggle').title = soundEnabled ? '关闭小狗音效' : '开启小狗音效';
+    $('#pet-sound-waves').setAttribute('d', soundEnabled ? 'M15 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14' : 'm16 9 5 6m0-6-5 6');
+    playSound('happy');
+    showToast(soundEnabled ? '轻轻的互动音效，打开啦。' : '音效已关闭。');
+  });
 
   function createPet() {
     const now = Date.now();
@@ -84,15 +130,16 @@
     $('#pet-name').textContent = pet.name;
     $('#dog-touch').setAttribute('aria-label', `摸摸${pet.name}`);
     $('#pet-description').textContent = '一只喜欢宝宝的黑色拉布拉多';
-    $('#room-status').textContent = pet.sleeping ? `${pet.name}在做美梦` : `${pet.name}在家`;
+    $('#room-status').textContent = pet.sleeping ? `${pet.name}在做美梦` : currentAction === 'play' ? `${pet.name}在追球` : currentAction === 'feed' ? `${pet.name}在吃东西` : `${pet.name}在家`;
     $('.room-bowl>span').textContent = pet.name.length > 4 ? '汪汪' : pet.name;
     $('#day-count').textContent = String(Math.max(1, Math.floor((Date.now() - pet.bornAt) / (24 * HOUR)) + 1));
     $('#pet-room').classList.toggle('is-sleeping', pet.sleeping);
     if (pet.sleeping) resetTilt();
+    if (liveDog) liveDog.sleep(pet.sleeping);
     $('#action-sleep').setAttribute('aria-pressed', String(pet.sleeping));
     $('#sleep-action-label').textContent = pet.sleeping ? '起床' : '睡觉';
     $('#sleep-action-hint').textContent = pet.sleeping ? '轻轻叫醒' : '充充电';
-    $('#room-bottom-note').textContent = pet.sleeping ? '让小狗休息一下，醒来再玩也很好' : '点点小狗，也可以摸摸它哦';
+    $('#room-bottom-note').textContent = pet.sleeping ? '让小狗休息一下，醒来再玩也很好' : liveDog ? '按住小狗轻轻摸，也可以拖动球球抛给它' : '点点小狗，也可以摸摸它哦';
     for (const key of ['hunger', 'mood', 'energy']) {
       const value = Math.round(pet[key]);
       $(`#${key}-label`).textContent = `${value}%`;
@@ -136,88 +183,106 @@
     }
   }
 
-  function animate(className, duration = 1600) {
-    clearTimeout(animationTimer);
-    $('#pet-room').classList.remove('is-stroking', 'is-feeding', 'is-playing');
-    void $('#pet-room').offsetWidth;
-    $('#pet-room').classList.add(className);
-    isBusy = true;
-    $('#pet-room').setAttribute('aria-busy', 'true');
-    document.querySelectorAll('.pet-action, #dog-touch').forEach((button) => { button.disabled = true; });
-    animationTimer = setTimeout(() => {
-      $('#pet-room').classList.remove(className);
-      isBusy = false;
-      $('#pet-room').setAttribute('aria-busy', 'false');
-      document.querySelectorAll('.pet-action, #dog-touch').forEach((button) => { button.disabled = false; });
-    }, reducedMotion.matches ? 200 : duration);
+  function setBusy(value) {
+    isBusy = value;
+    $('#pet-room').setAttribute('aria-busy', String(value));
+    document.querySelectorAll('#action-stroke,#action-feed,#action-play,#dog-touch,#food-bowl,#toy-ball').forEach((button) => { button.disabled = value; });
+    // Rest can interrupt a game; the user is never trapped in an animation.
+    $('#action-sleep').disabled = false;
   }
 
-  function interact(action) {
-    if (isBusy) return;
+  function animateFallback(className, duration) {
+    return new Promise((resolve) => {
+      $('#pet-room').classList.remove('is-stroking', 'is-feeding', 'is-playing');
+      void $('#pet-room').offsetWidth;
+      $('#pet-room').classList.add(className);
+      cancelFallback = () => { clearTimeout(animationTimer);resolve(false); };
+      animationTimer = setTimeout(() => { cancelFallback = null;resolve(true); }, reducedMotion.matches ? 120 : duration);
+    });
+  }
+
+  async function interact(action, options = {}) {
     settleTime();
-    if (pet.sleeping && action !== 'sleep') {
+    if (action === 'sleep') {
+      actionToken += 1;
+      if (cancelFallback) { cancelFallback();cancelFallback = null; }
+      liveDog?.cancel();
+      currentAction = null;setBusy(false);
+      $('#pet-room').classList.remove('is-stroking', 'is-feeding', 'is-playing');
+      pet.sleeping = !pet.sleeping;
+      $('#pet-speech').textContent = pet.sleeping ? '晚安宝宝，小狗先做个甜甜的梦。' : '睡醒啦！第一眼就看到宝宝，真好。';
+      remember(pet.sleeping ? `${pet.name}打起了小呼噜。` : `${pet.name}睡醒了，又可以一起玩啦。`);
+      render();persist();return;
+    }
+    if (isBusy) return;
+    if (pet.sleeping) {
       $('#pet-speech').textContent = action === 'stroke' ? '轻轻摸摸……小狗睡得更香啦。' : '小狗在休息，等它醒来再一起玩吧。';
       if (action === 'stroke') hearts();
-      persist();
-      render();
-      return;
+      render();persist();return;
     }
-    let speech;
+    if (action === 'feed' && pet.hunger >= 98) {
+      $('#pet-speech').textContent = '肚子已经圆圆啦，先收好零食吧。';liveDog?.cancel();render();persist();return;
+    }
+    if (action === 'play' && pet.energy < 30) {
+      $('#pet-speech').textContent = '小狗有点累啦，先陪它睡一小觉吧。';liveDog?.cancel();render();persist();return;
+    }
+    const token = ++actionToken;
+    currentAction = action;setBusy(true);render();
+    $('#pet-speech').textContent = action === 'feed' ? '听见碗里的声音啦，小黑走过去看看。' : action === 'play' ? '准备好啦，宝宝把球抛给我吧！' : options.zone === 'chin' ? '挠挠下巴，舒服得仰起头啦。' : options.zone === 'ear' ? '耳朵也想贴贴宝宝的手。' : '摸摸脑袋，小黑靠过来蹭蹭你。';
+    if (action === 'stroke') hearts();
+    let completed;
+    try {
+      completed = liveDog
+        ? await liveDog.perform(action, options)
+        : await animateFallback(({ stroke: 'is-stroking', feed: 'is-feeding', play: 'is-playing' })[action], action === 'stroke' ? 900 : 1800);
+    } catch { completed = false; }
+    if (token !== actionToken) return;
+    currentAction = null;setBusy(false);
+    $('#pet-room').classList.remove('is-stroking', 'is-feeding', 'is-playing');
+    if (!completed) { render();persist();return; }
+    // Care only counts once the dog has actually finished the interaction.
+    settleTime();
     if (action === 'stroke') {
-      const now = Date.now();
       pet.mood = clamp(pet.mood + 7);
-      if (now - lastStrokeAt > 5000) {
+      if (Date.now() - lastStrokeAt > 5000) {
         pet.affection = clamp(pet.affection + 3, 0, 9999);
-        remember(`宝宝摸了摸${pet.name}，尾巴摇起来啦。`);
-        lastStrokeAt = now;
+        remember(`宝宝摸了摸${pet.name}，小狗凑过来贴贴。`);lastStrokeAt = Date.now();
       }
-      const replies = ['最喜欢宝宝摸摸头啦！', '贴贴宝宝，汪 ♡', '小狗的喜欢，都写在尾巴上。'];
-      speech = replies[Math.floor(Math.random() * replies.length)];
-      animate('is-stroking', 900);
-      hearts();
+      $('#pet-speech').textContent = '最喜欢宝宝这样摸摸我啦 ♡';
     } else if (action === 'feed') {
-      if (pet.hunger >= 98) {
-        $('#pet-speech').textContent = '肚子已经圆圆啦，先收好零食吧。';
-        render(); persist(); return;
-      }
-      pet.hunger = clamp(pet.hunger + 22);
-      pet.mood = clamp(pet.mood + 4);
-      pet.affection = clamp(pet.affection + 2, 0, 9999);
-      speech = '啊呜！宝宝给的零食最好吃。';
-      remember(`${pet.name}吃到了宝宝喂的小零食。`);
-      animate('is-feeding', 1600);
+      pet.hunger = clamp(pet.hunger + 22);pet.mood = clamp(pet.mood + 4);pet.affection = clamp(pet.affection + 2, 0, 9999);
+      remember(`${pet.name}走到小碗前，认真吃完了零食。`);
+      $('#pet-speech').textContent = '舔舔嘴巴，宝宝给的零食真好吃。';
     } else if (action === 'play') {
-      if (pet.energy < 30) {
-        $('#pet-speech').textContent = '小狗有点累啦，先陪它睡一小觉吧。';
-        render(); persist(); return;
-      }
-      pet.mood = clamp(pet.mood + 12);
-      pet.energy = clamp(pet.energy - 9);
-      pet.hunger = clamp(pet.hunger - 3);
-      pet.affection = clamp(pet.affection + 4, 0, 9999);
-      speech = '球球捡回来啦！宝宝看我厉不厉害！';
-      remember(`和宝宝玩了一会儿球，超级开心。`);
-      animate('is-playing', 2200);
-    } else if (action === 'sleep') {
-      pet.sleeping = !pet.sleeping;
-      speech = pet.sleeping ? '晚安宝宝，小狗先做个甜甜的梦。' : '睡醒啦！第一眼就看到宝宝，真好。';
-      remember(pet.sleeping ? `${pet.name}打起了小呼噜。` : `${pet.name}睡醒了，又可以一起玩啦。`);
+      pet.mood = clamp(pet.mood + 12);pet.energy = clamp(pet.energy - 9);pet.hunger = clamp(pet.hunger - 3);pet.affection = clamp(pet.affection + 4, 0, 9999);
+      remember(`${pet.name}追到球，又叼回来送给了宝宝。`);
+      $('#pet-speech').textContent = '球球叼回来啦，放到宝宝面前！';
     }
-    $('#pet-speech').textContent = speech;
-    render();
-    persist();
+    render();persist();
   }
 
   $('#dog-touch').addEventListener('click', () => interact('stroke'));
   // A small perspective response adds depth without a heavy 3D engine.
   // Pointer values are capped, and touch gestures remain free to scroll the page.
   const room = $('#pet-room');
+  room.addEventListener('puppy:ready', (event) => { liveDog = event.detail;render(); });
+  room.addEventListener('puppy:pet', (event) => { void interact('stroke', event.detail); });
+  room.addEventListener('puppy:throw', (event) => { void interact('play', event.detail); });
+  room.addEventListener('puppy:phase', (event) => { if (currentAction) $('#pet-speech').textContent = event.detail.text; });
+  room.addEventListener('puppy:sound', (event) => playSound(event.detail.kind));
+  room.addEventListener('puppy:unavailable', () => { liveDog = null;render(); });
+  $('#food-bowl').addEventListener('click', () => { void interact('feed'); });
+  $('#toy-ball').addEventListener('click', (event) => {
+    // A captured drag has already emitted its own throw at pointerup.
+    if (Date.now() - (room.lastBallDrag || 0) < 400) return;
+    void interact('play');
+  });
   function resetTilt() {
     room.style.setProperty('--tilt-x', '0deg');
     room.style.setProperty('--tilt-y', '0deg');
   }
   room.addEventListener('pointermove', (event) => {
-    if (reducedMotion.matches || pet.sleeping || isBusy) return;
+    if (liveDog || reducedMotion.matches || pet.sleeping || isBusy) return;
     const bounds = room.getBoundingClientRect();
     const x = clamp((event.clientX - bounds.left) / bounds.width, 0, 1) - 0.5;
     const y = clamp((event.clientY - bounds.top) / bounds.height, 0, 1) - 0.5;
@@ -267,8 +332,13 @@
   });
   window.addEventListener('appinstalled', () => {
     installPrompt = undefined;
+    $('#install-button').hidden = true;
     showToast('小狗搬到宝宝的桌面啦 ♡');
   });
+  const standalone = matchMedia('(display-mode: standalone)');
+  function updateInstallButton() { $('#install-button').hidden = standalone.matches || navigator.standalone === true; }
+  standalone.addEventListener('change', updateInstallButton);
+  updateInstallButton();
 
   function refreshTime() {
     settleTime(); render(); persist();

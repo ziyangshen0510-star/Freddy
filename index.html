@@ -2,84 +2,11 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f8f8ef">
-  <meta name="description" content="写给 Kali 的一份小小心意。宝宝，这一次，小黑会认真回应你。">
-  <title>宝宝，小黑在。 · 写给 Kali</title>
-  <link rel="icon" href="./assets/paw.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./styles.css">
-  <script src="./app.js" defer></script>
+  <meta http-equiv="refresh" content="0;url=./pet/">
+  <title>小黑陪你</title>
+  <script>location.replace(new URL('./pet/',location.href).href);</script>
 </head>
-<body>
-  <a class="skip-link" href="#little-game">跳到小游戏</a>
-  <div class="page-grain" aria-hidden="true"></div>
-  <header class="site-header wrap">
-    <a class="brand" href="#" aria-label="小黑的心意，回到首页">
-      <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="9" cy="10" rx="3" ry="4" transform="rotate(-25 9 10)"/><ellipse cx="17" cy="7" rx="3" ry="4"/><ellipse cx="24" cy="12" rx="3" ry="4" transform="rotate(25 24 12)"/><path d="M7 24c0-4 5-11 9-11s10 7 10 11-5 3-10 3-9 1-9-3Z"/></svg></span>
-      <span>小黑的心意<span class="brand-sub">A LITTLE LOVE, JUST FOR YOU</span></span>
-    </a>
-    <div class="header-right"><span class="dedication"><span class="little-star">✧</span> 只给我的 Kali</span><button class="sound-button" id="sound-toggle" aria-label="开启互动音效" aria-pressed="false" title="开启互动音效"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path id="sound-waves" d="m16 9 5 6m0-6-5 6"/></svg></button></div>
-  </header>
-
-  <main>
-    <section class="hero wrap" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <div class="eyebrow"><span class="status-dot"></span> 一份来自小黑的认错小礼物</div>
-        <h1 id="hero-title">宝宝，<br>这一次<span class="title-comma">，</span><br class="mobile-break"><span class="hero-highlight">小黑在。</span><span class="title-spark" aria-hidden="true">✳</span></h1>
-        <p class="hero-description">那天视频时，你喊了我好几声，我却没有回应。<br>对不起，让你的期待落了空。<br>那些没接住的呼唤，我想好好补上。</p>
-        <a class="button button-primary hero-cta" href="#little-game">打开小黑的心意 <span aria-hidden="true">↗</span></a>
-        <div class="hero-notes"><span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m10 17-6-6C-2 5 7 0 10 6c3-6 12-1 6 5Z"/></svg> 3 个小小关卡</span><span class="note-divider"></span><span>不赶时间，慢慢来</span></div>
-      </div>
-      <div class="hero-art">
-        <span class="art-star star-one" aria-hidden="true">✧</span><span class="art-star star-two" aria-hidden="true">✦</span>
-        <div class="art-orbit" aria-hidden="true"></div>
-        <div class="illustration-paper">
-          <div class="paper-tape" aria-hidden="true"></div>
-          <span class="paper-caption">a little sorry, a lot of love.</span>
-          <div class="speech-bubble">宝宝，小黑在！<span aria-hidden="true">♡</span></div>
-          <img class="hero-dog" src="./assets/little-black.svg" alt="戴着薄荷绿领巾的黑色拉布拉多小黑，抱着一封贴有爱心的信，认真等着 Kali。" width="450" height="420">
-          <div class="paper-bottom"><span class="status-dot"></span> 正在认真听宝宝说话 <span aria-hidden="true">···</span></div>
-        </div>
-        <div class="floating-note"><span aria-hidden="true">♡</span> 你的每一声，都值得被回应。</div>
-        <span class="art-daisy" aria-hidden="true">✿</span>
-      </div>
-    </section>
-
-    <div class="small-divider wrap"><span></span><p>有点笨拙，但每一步都是真心的</p><span></span></div>
-
-    <section class="game-section wrap" id="little-game" aria-labelledby="game-heading">
-      <div class="section-heading"><div><div class="eyebrow">A SMALL JOURNEY FOR US</div><h2 id="game-heading">把没回应的那几声，<br class="mobile-only">变成好多句<span>「我在」。</span></h2></div><span class="section-doodle" aria-hidden="true">♡<svg viewBox="0 0 75 35"><path d="M3 6c19 34 49 24 65 3m-13 1 14-2-2 15"/></svg></span></div>
-      <ol class="journey" aria-label="小游戏进度">
-        <li class="journey-step is-current" data-step="0" aria-current="step"><span class="step-number">01</span><span><strong>回应你的每一声</strong><small>这次，一声都不漏</small></span><span class="step-check" aria-hidden="true">✓</span></li>
-        <li class="journey-step" data-step="1"><span class="step-number">02</span><span><strong>拼好我的真心</strong><small>把喜欢放进小事里</small></span><span class="step-check" aria-hidden="true">✓</span></li>
-        <li class="journey-step" data-step="2"><span class="step-number">03</span><span><strong>给宝宝的悄悄话</strong><small>有些话，想认真说</small></span><span class="step-check" aria-hidden="true">✓</span></li>
-      </ol>
-
-      <div class="game-card" id="game-card">
-        <section class="game-panel response-panel" id="stage-response" aria-labelledby="response-heading">
-          <div class="game-intro"><span class="chapter-label">第一关 / LISTEN & RESPOND</span><h3 id="response-heading" tabindex="-1">宝宝一喊，<br>小黑就到。</h3><p>如果那段视频可以重来，<br>我想这样回应你。</p><p class="game-instruction"><span aria-hidden="true">↗</span> 点一下回复，把「我在」送给宝宝。</p><div class="small-dog-note"><img src="./assets/paw.svg" alt="" width="26" height="26"><span>小黑已就位，耳朵认真营业中</span></div></div>
-          <div class="chat-playground"><div class="chat-window"><div class="chat-header"><span class="kali-avatar" aria-hidden="true">K</span><span><strong>我的宝宝 Kali</strong><small><span class="status-dot"></span> 这一次，好好听你说</small></span><span class="video-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="12" height="12" rx="3"/><path d="m15 10 6-3v10l-6-3"/></svg></span></div><div class="chat-body" id="chat-body" role="log" aria-label="宝宝和小黑的对话" aria-live="polite"></div><div class="chat-footer"><button class="reply-button" id="reply-button">我在，宝宝。 <span aria-hidden="true">↑</span></button><span id="response-counter" class="response-counter">第 1 声 / 共 3 声</span></div></div><div class="response-success" id="response-success" hidden><span>每一声，都接住了 ♡</span><button class="text-button" id="to-promises">去拼好我的真心 <span aria-hidden="true">→</span></button></div></div>
-        </section>
-
-        <section class="game-panel promises-panel" id="stage-promises" aria-labelledby="promises-heading" hidden>
-          <div class="game-intro"><span class="chapter-label">第二关 / LITTLE PROMISES</span><h3 id="promises-heading" tabindex="-1">真心不只在话里，<br>也在每件小事里。</h3><p>小黑准备了四个小约定。<br>点开每一块，把这颗心慢慢拼完整。</p><div class="promise-progress"><span id="promise-count">0</span><span>/ 4 份认真</span><div class="promise-track"><span id="promise-progress-bar"></span></div></div><p class="promise-caption" id="promise-caption" aria-live="polite">每点开一块，就收好一个约定。</p></div>
-          <div class="promise-playground"><div class="promise-grid"><button class="promise-tile" data-promise="0" aria-pressed="false"><span class="promise-tile-top"><span>01</span><svg class="heart-piece" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42 7 26C-9 8 16-3 24 13 32-3 57 8 41 26Z"/></svg></span><strong>每一声，都回应</strong><span class="promise-detail">听到你喊我，就认真回答。<br>漏听了，也及时说声对不起。</span><span class="promise-tile-bottom">轻轻点开 <span aria-hidden="true">＋</span></span></button><button class="promise-tile" data-promise="1" aria-pressed="false"><span class="promise-tile-top"><span>02</span><svg class="heart-piece" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42 7 26C-9 8 16-3 24 13 32-3 57 8 41 26Z"/></svg></span><strong>有事，先告诉你</strong><span class="promise-detail">需要暂时离开时，先告诉你，<br>不让你对着屏幕等回应。</span><span class="promise-tile-bottom">轻轻点开 <span aria-hidden="true">＋</span></span></button><button class="promise-tile" data-promise="2" aria-pressed="false"><span class="promise-tile-top"><span>03</span><svg class="heart-piece" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42 7 26C-9 8 16-3 24 13 32-3 57 8 41 26Z"/></svg></span><strong>陪你，就认真陪</strong><span class="promise-detail">视频的时候，少一点分心，<br>把注意力留给屏幕里的你。</span><span class="promise-tile-bottom">轻轻点开 <span aria-hidden="true">＋</span></span></button><button class="promise-tile" data-promise="3" aria-pressed="false"><span class="promise-tile-top"><span>04</span><svg class="heart-piece" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42 7 26C-9 8 16-3 24 13 32-3 57 8 41 26Z"/></svg></span><strong>你的感受，认真听</strong><span class="promise-detail">你不开心时，先听你说完，<br>不急着解释，也不敷衍过去。</span><span class="promise-tile-bottom">轻轻点开 <span aria-hidden="true">＋</span></span></button></div><div class="promise-next"><span id="promise-next-hint">四个小约定，慢慢打开就好。</span><button class="text-button" id="to-letter" hidden>收到了，打开信吧 <span aria-hidden="true">→</span></button></div></div>
-        </section>
-
-        <section class="letter-panel" id="stage-letter" aria-labelledby="letter-heading" hidden>
-          <div class="sealed-letter" id="sealed-letter"><span class="chapter-label">第三关 / WORDS FROM MY HEART</span><h3 id="letter-heading" tabindex="-1">有一封信，<br>小黑想亲手交给你。</h3><button class="envelope" id="open-letter" aria-label="打开小黑写给 Kali 的道歉信"><span class="envelope-back"></span><span class="envelope-letter">Dear Kali,</span><span class="envelope-front"></span><span class="envelope-flap"></span><span class="envelope-seal">♡</span></button><p>轻轻点开，里面装着我的认真。</p></div>
-          <div class="opened-letter" id="opened-letter" hidden><div class="letter-paper"><div class="letter-topline"><span>FOR MY DEAREST KALI</span><span aria-hidden="true">♡</span></div><h3 id="open-letter-heading" tabindex="-1">亲爱的宝宝：</h3><div class="letter-body"><p>那天我们打视频，你喊了我好几次，我都没有回应。后来意识到这件事，我真的很懊恼。对不起，宝宝。</p><p>你喊我的时候，应该得到一句及时的「我在」，而不是一次又一次等不到回应。无论我当时在忙什么，都该先告诉你，而不是让你觉得自己被晾在一边。</p><p>我做这个小网站，是想认真向你道歉。刚才的几个小约定，我也想带到以后的每一次视频、每一次相处里，用行动慢慢做到。</p><p>我希望还能做你喜欢的那只小黑，但我知道，原谅不是玩完一个游戏就要交出的答案。你可以继续生气，可以告诉我你的委屈，也可以再给自己一点时间。我会认真听。</p><p class="letter-emphasis">宝宝，下次你喊我，<br>我想让你听见：「我在呢。」</p></div><div class="letter-signature"><span>一直想好好陪着你的</span><strong>小黑 <svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="9" cy="10" rx="3" ry="4"/><ellipse cx="17" cy="7" rx="3" ry="4"/><ellipse cx="24" cy="12" rx="3" ry="4"/><path d="M7 24c0-4 5-11 9-11s10 7 10 11-5 3-10 3-9 1-9-3Z"/></svg></strong></div></div><div class="letter-response"><p>如果你愿意，可以告诉小黑现在的心情。</p><div class="choice-buttons"><button class="button button-primary" id="choose-hug"><span aria-hidden="true">♡</span> 给你一个抱抱</button><button class="button button-secondary" id="choose-time">我还需要一点时间</button></div><span class="choice-footnote">没有标准答案，你的感受最重要。这里的选择不会自动发送。</span></div></div>
-          <div class="ending" id="ending" hidden aria-live="polite"><div class="ending-art"><img src="./assets/little-black.svg" alt="小黑抱着给宝宝的信，安静陪伴。" width="260" height="243"><span class="ending-heart" aria-hidden="true">♡</span></div><span class="chapter-label" id="ending-eyebrow"></span><h3 id="ending-heading" tabindex="-1"></h3><p id="ending-copy"></p><div class="ending-actions"><button class="button button-primary" id="save-letter">收好这封信 <span aria-hidden="true">↓</span></button><button class="text-button" id="read-again">再看看信 <span aria-hidden="true">↗</span></button></div><p class="ending-small">心意留在这里，选择一直在你手里。</p></div>
-        </section>
-      </div>
-      <div class="under-game"><span><span aria-hidden="true">✧</span> 不是闯关换原谅，只是想把真心慢慢给你看。</span><button class="restart-button" id="restart" hidden>从头再玩一次 <span aria-hidden="true">↻</span></button></div>
-    </section>
-
-    <section class="closing wrap" aria-label="小黑的最后一句话"><span class="closing-heart" aria-hidden="true">♡</span><p>你不用一下子就开心起来。<br>小黑会学着，<span>把喜欢变成让你安心的小事。</span></p><span class="closing-sign">— 给唯一的宝宝 Kali</span></section>
-    <aside class="pet-invitation wrap"><img src="./assets/paw.svg" width="37" height="37" alt=""><div><strong>还有一只小狗，想每天陪着宝宝。</strong><p>摸摸头，喂点零食，一起过慢悠悠的日子。</p></div><a href="./pet/">去小小狗窝 <span aria-hidden="true">↗</span></a></aside>
-  </main>
-  <footer class="site-footer wrap"><span>MADE WITH A SORRY & A WHOLE LOT OF LOVE</span><span>小黑 <span class="footer-heart" aria-hidden="true">♡</span> Kali</span></footer>
-  <div class="confetti-layer" id="confetti" aria-hidden="true"></div>
-  <div class="toast" id="toast" role="status" hidden></div>
-</body>
+<body style="font-family:system-ui;background:#f8f8ef;color:#55765b;padding:40px"><p>小黑在自己的小窝等你。</p><a href="./pet/">打开小黑陪你 →</a></body>
 </html>

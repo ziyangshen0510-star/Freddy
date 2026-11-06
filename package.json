@@ -1,12 +1,13 @@
 {
-  "name": "little-black-for-kali",
+  "name": "little-black-companion",
   "version": "1.0.0",
   "private": true,
-  "description": "小黑写给宝宝 Kali 的互动道歉小网站",
+  "description": "Kali 的独立三维宠物应用",
   "scripts": {
     "start": "node server.cjs",
     "dev": "node server.cjs",
-    "check": "node --check app.js && node --check server.cjs && node --check pet/pet.js && node --check pet/sw.js"
+    "check": "node --check server.cjs && node --check pet/pet.js && node --check pet/sw.js && node --input-type=module --check < pet/puppy-world.js",
+    "build:puppy": "node scripts/build-puppy.cjs"
   },
   "engines": { "node": ">=18" }
 }

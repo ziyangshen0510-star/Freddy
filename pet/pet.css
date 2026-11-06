@@ -1,9 +1,25 @@
 .pet-wrap{width:min(960px,calc(100% - 64px));margin-inline:auto}
+.pet-page{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 .pet-header{height:106px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
 .pet-brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:550;letter-spacing:1px}
 .pet-brand img{transform:rotate(-8deg)}
 .pet-brand small{font-size:7px;display:block;letter-spacing:1.3px;margin-top:6px;font-weight:400;color:#89947c}
 .pet-icon-button{border:1px solid #d8dfcd;border-radius:50%;width:35px;height:35px;display:grid;place-items:center;background:transparent;font-size:23px;line-height:1;color:#7d8f6b;padding-bottom:10px}
+.pet-header-controls{display:flex;align-items:center;gap:12px}
+.pet-world{position:absolute;inset:0;z-index:1;pointer-events:none}
+.pet-world canvas{display:block;width:100%;height:100%;touch-action:none}
+.has-live-dog .pet-world{pointer-events:auto}
+.has-live-dog .dog-touch{opacity:0;pointer-events:none}
+.has-live-dog .dog-touch:focus-visible{opacity:1}
+.has-live-dog .dog-touch:focus-visible .dog-portrait,.has-live-dog .dog-touch:focus-visible .dog-ground-shadow{visibility:hidden}
+.has-live-dog .room-bowl,.has-live-dog .room-ball{position:absolute;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border:0;background:transparent;box-shadow:none;transform:translate(-50%,-50%);bottom:auto;right:auto;z-index:3;touch-action:none;border-radius:50%;cursor:grab}
+.has-live-dog .room-bowl:before,.has-live-dog .room-ball:before,.has-live-dog .room-bowl>span{display:none}
+.has-live-dog .room-ball:active{cursor:grabbing}
+.has-live-dog.is-playing .room-ball{animation:none}
+.has-live-dog.is-feeding .room-snack{display:none}
+.live-dog-indicator{position:absolute;right:12px;top:12px;z-index:2;border:1px solid #ccdac1;background:#f7faedb5;padding:4px 7px;border-radius:15px;font-size:7px;line-height:1.4;color:#799169;letter-spacing:.2px;pointer-events:none}
+.has-live-dog .pet-speech{top:19%}
+.has-live-dog.is-sleeping .pet-speech{top:26%}
 .pet-greeting{display:flex;justify-content:space-between;align-items:center;padding:39px 0 27px;gap:15px}
 .pet-eyebrow{font-size:8px;letter-spacing:1.4px;color:#8c9a7b}
 .pet-greeting h1{font-size:28px;letter-spacing:1px;line-height:1.7;margin:8px 0 0}

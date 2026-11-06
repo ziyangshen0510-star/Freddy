@@ -5,8 +5,8 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = __dirname;
-const publicFiles = new Set(['index.html', 'styles.css', 'app.js', 'assets/paw.svg', 'assets/little-black.svg', 'pet/index.html', 'pet/pet.css', 'pet/pet.js', 'pet/manifest.webmanifest', 'pet/sw.js', 'pet/icon.svg', 'pet/icon-192.png', 'pet/icon-512.png', 'pet/puppy-awake.png', 'pet/puppy-asleep.png']);
-const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.webmanifest': 'application/manifest+json; charset=utf-8' };
+const publicFiles = new Set(['index.html', 'styles.css', 'assets/paw.svg', 'pet/index.html', 'pet/pet.css', 'pet/pet.js', 'pet/manifest.webmanifest', 'pet/sw.js', 'pet/icon.svg', 'pet/icon-192.png', 'pet/icon-512.png', 'pet/puppy-awake.png', 'pet/puppy-asleep.png', 'pet/puppy-world.bundle.js', 'pet/puppy-world.bundle.js.LEGAL.txt']);
+const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.txt': 'text/plain; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.webmanifest': 'application/manifest+json; charset=utf-8' };
 const port = Number(process.env.PORT || 3000);
 
 http.createServer((req, res) => {
@@ -31,4 +31,4 @@ http.createServer((req, res) => {
     });
     res.end(req.method === 'HEAD' ? undefined : data);
   });
-}).listen(port, '0.0.0.0', () => console.log(`小黑的心意 is running on port ${port}`));
+}).listen(port, '0.0.0.0', () => console.log(`小黑陪你 is running on port ${port}`));

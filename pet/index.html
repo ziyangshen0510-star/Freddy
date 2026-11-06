@@ -6,19 +6,21 @@
   <meta name="theme-color" content="#f8f8ef">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="小黑陪你">
   <meta name="description" content="Kali 的小小狗窝。摸摸、喂食、玩球，陪小黑一起过慢悠悠的日子。">
-  <title>Kali 的小小狗窝 · 小黑陪你</title>
+  <title>小黑陪你 · Kali 的小小狗窝</title>
   <link rel="icon" href="../assets/paw.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="preload" href="./puppy-awake.png" as="image">
-  <link rel="stylesheet" href="../styles.css">
-  <link rel="stylesheet" href="./pet.css?v=2">
-  <script src="./pet.js?v=2" defer></script>
+  <link rel="stylesheet" href="../styles.css?v=3">
+  <link rel="stylesheet" href="./pet.css?v=3">
+  <script src="./pet.js?v=3" defer></script>
+  <script src="./puppy-world.bundle.js?v=3" defer></script>
 </head>
 <body class="pet-page">
   <div class="page-grain" aria-hidden="true"></div>
-  <header class="pet-header pet-wrap"><a class="pet-brand" href="./" aria-label="小小狗窝首页"><img src="../assets/paw.svg" width="35" height="35" alt=""><span>Kali 的小小狗窝<small>A LITTLE PAW, A LITTLE COMPANY</small></span></a><button class="pet-icon-button" id="help-button" aria-label="关于小狗、改名字与安装">⋯</button></header>
+  <header class="pet-header pet-wrap"><a class="pet-brand" href="./" aria-label="小小狗窝首页"><img src="../assets/paw.svg" width="35" height="35" alt=""><span>Kali 的小小狗窝<small>A LITTLE PAW, A LITTLE COMPANY</small></span></a><div class="pet-header-controls"><button class="sound-button" id="pet-sound-toggle" aria-label="开启小狗音效" aria-pressed="false" title="开启小狗音效"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path id="pet-sound-waves" d="m16 9 5 6m0-6-5 6"/></svg></button><button class="pet-icon-button" id="help-button" aria-label="关于小狗、改名字与安装">⋯</button></div></header>
   <main class="pet-wrap">
     <div class="pet-greeting"><div><span class="pet-eyebrow" id="greeting-eyebrow">不慌不忙，一起长大</span><h1 id="pet-greeting">今天，也陪宝宝一下。</h1></div><span class="day-badge"><span aria-hidden="true">☀</span> 陪伴第 <strong id="day-count">1</strong> 天</span></div>
     <div class="pet-layout">
@@ -27,6 +29,8 @@
         <span class="room-label"><span class="status-dot"></span> <span id="room-status">小黑在家</span></span>
         <div class="pet-speech" id="pet-speech" role="status">宝宝，你来啦！摸摸我的头嘛。</div>
         <div class="room-rug" aria-hidden="true"></div>
+        <div class="pet-world" id="pet-world" aria-hidden="true"></div>
+        <span class="live-dog-indicator" id="interaction-state" hidden>会动的小黑 · 可以摸摸它</span>
         <span class="sleep-zzz" aria-hidden="true">z <span>z</span> Z</span>
         <button class="dog-touch" id="dog-touch" aria-label="摸摸小黑">
           <span class="dog-scene">
@@ -37,7 +41,7 @@
             </span></span>
           </span>
         </button>
-        <div class="room-bowl" aria-hidden="true"><span>小黑</span></div><div class="room-ball" aria-hidden="true"></div><span class="room-snack" aria-hidden="true">✦</span>
+        <button type="button" class="room-bowl" id="food-bowl" aria-label="喂小黑吃东西" title="点击喂食"><span>小黑</span></button><button type="button" class="room-ball" id="toy-ball" aria-label="抛球给小黑" title="拖动或点击抛球"></button><span class="room-snack" aria-hidden="true">✦</span>
         <div class="pet-hearts" id="pet-hearts" aria-hidden="true"></div>
         <span class="room-bottom-note" id="room-bottom-note">点点小狗，也可以摸摸它哦</span>
       </section>
@@ -52,7 +56,7 @@
     </div>
     <div class="pet-bottom"><span><span aria-hidden="true">✧</span> 你忙的时候，它也会好好等你。</span><button id="install-button">放到手机桌面 <span aria-hidden="true">↗</span></button></div>
   </main>
-  <footer class="pet-footer pet-wrap"><a href="../">← 小黑写给宝宝的信</a><span>小小陪伴，长长久久 ♡</span></footer>
+  <footer class="pet-footer pet-wrap"><span>属于 Kali 和小黑的小世界</span><span>小小陪伴，长长久久 ♡</span></footer>
 
   <dialog class="pet-dialog" id="pet-dialog" aria-labelledby="dialog-heading"><button class="dialog-close" id="dialog-close" aria-label="关闭">×</button><span class="pet-eyebrow">OUR LITTLE HOME</span><h2 id="dialog-heading">给小狗一个名字</h2><form id="rename-form"><label for="pet-name-input">宝宝想叫它什么呢？</label><div class="rename-row"><input id="pet-name-input" name="pet-name" maxlength="12" autocomplete="off" required placeholder="小黑"><button class="button button-primary" type="submit">就叫这个</button></div></form><div class="install-help"><h3>把小狗放到手机桌面</h3><p>iPhone：用 Safari 打开，点「分享」，选择「添加到主屏幕」。</p><p>Android：用 Chrome 打开，在菜单里选择「安装应用」或「添加到主屏幕」。</p><small>需要先用上线后的 HTTPS 网址打开一次。添加后可以像小 App 一样独立打开，离线也能陪你。</small></div><div class="data-note">小狗的状态只保存在当前浏览器。清除网站数据或换设备会重新开始，卸载浏览器前记得这一点哦。</div></dialog>
   <div class="toast" id="toast" role="status" hidden></div>
