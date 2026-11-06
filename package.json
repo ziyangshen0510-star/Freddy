@@ -1,0 +1,12 @@
+{
+  "name": "little-black-for-kali",
+  "version": "1.0.0",
+  "private": true,
+  "description": "小黑写给宝宝 Kali 的互动道歉小网站",
+  "scripts": {
+    "start": "node server.cjs",
+    "dev": "node server.cjs",
+    "check": "node --check app.js && node --check server.cjs && node --check pet/pet.js && node --check pet/sw.js"
+  },
+  "engines": { "node": ">=18" }
+}
