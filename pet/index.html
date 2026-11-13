@@ -3,64 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f8f8ef">
+  <meta name="theme-color" content="#f7f7f0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="小黑陪你">
-  <meta name="description" content="Kali 的小小狗窝。摸摸、喂食、玩球，陪小黑一起过慢悠悠的日子。">
+  <meta name="description" content="Kali 的小小狗窝。摸摸、喂食、玩球，把平凡的日子过成温柔的小事。">
   <title>小黑陪你 · Kali 的小小狗窝</title>
   <link rel="icon" href="../assets/paw.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="preload" href="./puppy-awake.png" as="image">
-  <link rel="stylesheet" href="../styles.css?v=5">
-  <link rel="stylesheet" href="./pet.css?v=5">
-  <link rel="stylesheet" href="./room-style.css?v=5">
-  <script src="./pet.js?v=5" defer></script>
-  <script src="./room-style.js?v=5" defer></script>
-  <script src="./puppy-world.bundle.js?v=5" defer></script>
+  <link rel="stylesheet" href="../styles.css?v=6">
+  <link rel="stylesheet" href="./pet.css?v=6">
+  <link rel="stylesheet" href="./room-style.css?v=6">
+  <script src="./pet.js?v=6" defer></script>
+  <script src="./room-style.js?v=6" defer></script>
+  <script src="./puppy-world.bundle.js?v=6" defer></script>
 </head>
 <body class="pet-page">
   <div class="page-grain" aria-hidden="true"></div>
-  <header class="pet-header pet-wrap"><a class="pet-brand" href="./" aria-label="小小狗窝首页"><img src="../assets/paw.svg" width="35" height="35" alt=""><span>Kali 的小小狗窝<small>A LITTLE PAW, A LITTLE COMPANY</small></span></a><div class="pet-header-controls"><button class="sound-button" id="pet-sound-toggle" aria-label="开启小狗音效" aria-pressed="false" title="开启小狗音效"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path id="pet-sound-waves" d="m16 9 5 6m0-6-5 6"/></svg></button><button class="pet-icon-button" id="help-button" aria-label="关于小狗、改名字与安装">⋯</button></div></header>
+  <header class="pet-header pet-wrap">
+    <a class="pet-brand" href="./" aria-label="小小狗窝首页"><img src="../assets/paw.svg" width="42" height="42" alt=""><span>Kali 的小小狗窝<small>A LITTLE PAW, A LITTLE COMPANY</small></span></a>
+    <span class="header-note">把日子过成，喜欢的样子。<span aria-hidden="true">✽</span></span>
+    <div class="pet-header-controls">
+      <button class="sound-button" id="pet-sound-toggle" aria-label="开启小狗音效" aria-pressed="false" title="开启小狗音效"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path id="pet-sound-waves" d="m16 9 5 6m0-6-5 6"/></svg></button>
+      <button class="pet-icon-button" id="help-button" aria-label="关于小狗、改名字与安装" title="小窝使用说明"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
+    </div>
+  </header>
   <main class="pet-wrap">
-    <div class="pet-greeting"><div><span class="pet-eyebrow" id="greeting-eyebrow">不慌不忙，一起长大</span><h1 id="pet-greeting">今天，也陪宝宝一下。</h1></div><span class="day-badge"><span aria-hidden="true">☀</span> 陪伴第 <strong id="day-count">1</strong> 天</span></div>
+    <div class="pet-greeting">
+      <div><div class="greeting-kicker"><span class="kicker-line" aria-hidden="true"></span><span class="pet-eyebrow" id="greeting-eyebrow">今天也给你留了位置</span><span class="greeting-date" id="greeting-date"></span></div><h1 id="pet-greeting">今天，也陪宝宝一下。</h1><p class="greeting-subtitle">世界可以很忙，这里可以慢一点。</p></div>
+      <div class="day-badge"><span class="day-badge-sun" aria-hidden="true">☼</span><div><span>我们的陪伴日记</span><span class="day-badge-number">第 <strong id="day-count">1</strong> 天</span></div><span class="day-badge-heart" aria-hidden="true">♡</span></div>
+    </div>
     <div class="pet-layout">
-      <section class="pet-room" id="pet-room" aria-label="小狗的房间">
-        <div class="room-wall" aria-hidden="true"><div class="room-window"><span class="window-sun"></span><span class="window-cloud cloud-one"></span><span class="window-cloud cloud-two"></span><span class="window-cross"></span></div><div class="wall-picture"><span>♡</span><small>our little home</small></div><div class="room-plant"><span></span><span></span><span></span><i></i></div></div>
-        <span class="room-label"><span class="status-dot"></span> <span id="room-status">小黑在家</span></span>
-        <div class="pet-speech" id="pet-speech" role="status">宝宝，你来啦！摸摸我的头嘛。</div>
-        <div class="room-rug" aria-hidden="true"></div>
-        <div class="pet-world" id="pet-world" aria-hidden="true"></div>
-        <span class="live-dog-indicator" id="interaction-state" hidden>会动的小黑 · 可以摸摸它</span>
-        <span class="sleep-zzz" aria-hidden="true">z <span>z</span> Z</span>
-        <button class="dog-touch" id="dog-touch" aria-label="摸摸小黑">
-          <span class="dog-scene">
-            <span class="dog-ground-shadow" aria-hidden="true"></span>
-            <span class="dog-parallax"><span class="dog-motion">
-              <img class="dog-portrait dog-awake" src="./puppy-awake.png" alt="戴着薄荷绿领巾的黑色拉布拉多幼犬，毛茸茸的耳朵，湿润的鼻子，温柔地望着你。" width="1145" height="1373" fetchpriority="high" decoding="async" draggable="false">
-              <img class="dog-portrait dog-asleep" src="./puppy-asleep.png" alt="小黑把下巴枕在前爪上，闭着眼睛，蜷成一团睡着了。" width="1756" height="896" decoding="async" draggable="false">
-            </span></span>
-          </span>
-        </button>
-        <button type="button" class="room-bowl" id="food-bowl" aria-label="喂小黑吃东西" title="点击喂食"><span>小黑</span></button><button type="button" class="room-ball" id="toy-ball" aria-label="抛球给小黑" title="拖动或点击抛球"></button><span class="room-snack" aria-hidden="true">✦</span>
-        <div class="pet-hearts" id="pet-hearts" aria-hidden="true"></div>
-        <span class="room-bottom-note" id="room-bottom-note">点点小狗，也可以摸摸它哦</span>
-      </section>
-
+      <div class="pet-room-column">
+        <section class="pet-room" id="pet-room" aria-label="小狗的房间">
+          <div class="room-wall" aria-hidden="true">
+            <div class="room-window"><span class="window-sun"></span><span class="window-cloud cloud-one"></span><span class="window-cloud cloud-two"></span><span class="window-cross"></span></div>
+            <div class="window-curtain curtain-left"></div><div class="window-curtain curtain-right"></div>
+            <div class="wall-picture"><span>♡</span><small>better together</small></div>
+            <div class="room-shelf"><span class="shelf-book book-one"></span><span class="shelf-book book-two"></span><span class="shelf-book book-three"></span><span class="shelf-vase"><i></i></span></div>
+            <div class="room-plant"><span></span><span></span><span></span><i></i></div>
+          </div>
+          <div class="room-sunbeam" aria-hidden="true"></div>
+          <div class="room-heading"><span class="room-heading-title">小窝里的慢时光 <span aria-hidden="true">✧</span></span><span class="room-label"><span class="status-dot"></span><span id="room-status">小黑在家</span></span></div>
+          <div class="pet-speech" id="pet-speech" role="status">宝宝，你来啦！摸摸我的头嘛。</div>
+          <div class="room-rug" aria-hidden="true"></div>
+          <div class="pet-world" id="pet-world" aria-hidden="true"></div>
+          <span class="live-dog-indicator" id="interaction-state" hidden>会动的小黑 · 可以摸摸它</span>
+          <span class="sleep-zzz" aria-hidden="true">z <span>z</span> Z</span>
+          <button class="dog-touch" id="dog-touch" aria-label="摸摸小黑">
+            <span class="dog-scene"><span class="dog-ground-shadow" aria-hidden="true"></span><span class="dog-parallax"><span class="dog-motion">
+              <img class="dog-portrait dog-awake" src="./puppy-awake.png" alt="戴着薄荷绿领巾的黑色拉布拉多幼犬，温柔地望着你。" width="1145" height="1373" fetchpriority="high" decoding="async" draggable="false">
+              <img class="dog-portrait dog-asleep" src="./puppy-asleep.png" alt="小黑把下巴枕在前爪上，闭着眼睛睡着了。" width="1756" height="896" decoding="async" draggable="false">
+            </span></span></span>
+          </button>
+          <button type="button" class="room-bowl" id="food-bowl" aria-label="喂小黑吃东西" title="点击喂食"><span>小黑</span></button>
+          <button type="button" class="room-ball" id="toy-ball" aria-label="抛球给小黑" title="拖动或点击抛球"></button><span class="room-snack" aria-hidden="true">✦</span>
+          <div class="pet-hearts" id="pet-hearts" aria-hidden="true"></div>
+          <span class="room-bottom-note" id="room-bottom-note">点点小狗，也可以摸摸它哦</span>
+        </section>
+        <div class="room-caption"><span><span class="caption-dot" aria-hidden="true"></span><span id="room-style-caption">薄荷小窝 · 编织地毯</span></span><button type="button" id="room-style-shortcut" aria-haspopup="dialog" aria-controls="room-decor-dialog">换个心情 <span aria-hidden="true">↗</span></button></div>
+        <div class="room-note"><svg viewBox="0 0 48 64" aria-hidden="true"><path d="M21 58c7-16 5-31 7-49M25 39C9 40 7 29 8 24c12 0 18 6 17 15ZM27 28c-1-13 8-19 15-19 2 11-5 18-15 19ZM26 50c1-11 7-16 14-15 0 10-6 15-14 15Z"/></svg><div><strong>小小的陪伴，刚刚好的幸福。</strong><p>不必特意做什么，你在，就是很好的事情。</p></div><span class="room-note-flower" aria-hidden="true">✽</span></div>
+      </div>
       <section class="pet-controls" aria-label="照顾小狗">
-        <div class="pet-profile"><div><span class="pet-eyebrow">YOUR LITTLE COMPANION</span><h2><span id="pet-name">小黑</span><button class="rename-button" id="rename-button" aria-label="给小狗改名字">✎</button></h2><p id="pet-description">一只喜欢宝宝的黑色拉布拉多</p></div><span class="pet-profile-heart" aria-hidden="true">♡</span></div>
-        <div class="pet-stats" aria-label="小狗的状态"><div class="pet-stat"><div><span>饱饱</span><span id="hunger-label">80%</span></div><div class="stat-meter" role="meter" aria-label="饱腹度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="80" id="hunger-meter"><span></span></div></div><div class="pet-stat"><div><span>开心</span><span id="mood-label">85%</span></div><div class="stat-meter" role="meter" aria-label="心情" aria-valuemin="0" aria-valuemax="100" aria-valuenow="85" id="mood-meter"><span></span></div></div><div class="pet-stat"><div><span>精神</span><span id="energy-label">85%</span></div><div class="stat-meter" role="meter" aria-label="精力" aria-valuemin="0" aria-valuemax="100" aria-valuenow="85" id="energy-meter"><span></span></div></div></div>
-        <div class="pet-actions"><button class="pet-action" id="action-stroke"><span class="action-icon" aria-hidden="true">♡</span><strong>摸摸</strong><small>小狗贴贴</small></button><button class="pet-action" id="action-feed"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M5 15h22l-3 11H8L5 15Z"/><path d="M9 15c-3-6 4-10 7-5 3-5 10-1 7 5"/><path d="M11 21h10"/></svg></span><strong>喂食</strong><small>吃饱饱</small></button><button class="pet-action" id="action-play"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="10"/><path d="M9 9c8 0 14 6 14 14M6 17c6 1 10-4 10-11m0 20c0-6 5-10 10-10"/></svg></span><strong>玩球</strong><small>一起玩耍</small></button><button class="pet-action" id="action-sleep" aria-pressed="false"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M23 21A11 11 0 0 1 12 7a11 11 0 1 0 11 14Z"/><path d="m23 6 1 3 3 1-3 1-1 3-1-3-3-1 3-1Z"/></svg></span><strong id="sleep-action-label">睡觉</strong><small id="sleep-action-hint">充充电</small></button></div>
-        <div class="companionship"><span class="companionship-icon" aria-hidden="true">✿</span><div><strong id="affection-heading">今天，也是被喜欢的小狗。</strong><p id="affection-copy">不需要打卡，有空来看看就很好。</p></div></div>
-        <div class="pet-memory"><span class="pet-eyebrow">OUR LITTLE MOMENTS</span><div id="memory-list" aria-label="最近的陪伴记录"></div></div>
+        <div class="pet-profile"><div><span class="pet-eyebrow">YOUR LITTLE COMPANION</span><h2><span id="pet-name">小黑</span><button class="rename-button" id="rename-button" aria-label="给小狗改名字" title="给小狗改名字"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M5 19l1-5L16 4a2.8 2.8 0 0 1 4 4L10 18l-5 1ZM13 20h7"/></svg></button></h2><p id="pet-description">一只喜欢宝宝的黑色拉布拉多</p></div><div class="bond-badge"><span aria-hidden="true">♡</span><small id="bond-label">初见也欢喜</small></div></div>
+        <div class="care-section-heading"><h3>把小小的它，照顾好</h3><span id="care-hint">现在的它，心情很好</span></div>
+        <div class="pet-stats" aria-label="小狗的状态">
+          <div class="pet-stat"><div><span>饱饱</span><span id="hunger-label">80%</span></div><div class="stat-meter" role="meter" aria-label="饱腹度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="80" id="hunger-meter"><span></span></div></div>
+          <div class="pet-stat"><div><span>开心</span><span id="mood-label">85%</span></div><div class="stat-meter" role="meter" aria-label="心情" aria-valuemin="0" aria-valuemax="100" aria-valuenow="85" id="mood-meter"><span></span></div></div>
+          <div class="pet-stat"><div><span>精神</span><span id="energy-label">85%</span></div><div class="stat-meter" role="meter" aria-label="精力" aria-valuemin="0" aria-valuemax="100" aria-valuenow="85" id="energy-meter"><span></span></div></div>
+        </div>
+        <div class="pet-actions">
+          <button class="pet-action" id="action-stroke"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 27 5.5 16.5C-2 8 10 1 16 10 22 1 34 8 26.5 16.5L16 27Z"/></svg></span><strong>摸摸</strong><small>把喜欢给你</small></button>
+          <button class="pet-action" id="action-feed"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M5 15h22l-3 11H8L5 15Z"/><path d="M9 15c-3-6 4-10 7-5 3-5 10-1 7 5M11 21h10"/></svg></span><strong>喂食</strong><small>一口小满足</small></button>
+          <button class="pet-action" id="action-play"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="10"/><path d="M9 9c8 0 14 6 14 14M6 17c6 1 10-4 10-11m0 20c0-6 5-10 10-10"/></svg></span><strong>玩球</strong><small>快乐蹦蹦跳</small></button>
+          <button class="pet-action" id="action-sleep" aria-pressed="false"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M23 21A11 11 0 0 1 12 7a11 11 0 1 0 11 14Z"/><path d="m23 6 1 3 3 1-3 1-1 3-1-3-3-1 3-1Z"/></svg></span><strong id="sleep-action-label">睡觉</strong><small id="sleep-action-hint">做个甜甜的梦</small></button>
+        </div>
+        <div class="companionship"><span class="companionship-icon" aria-hidden="true">✽</span><div><strong id="affection-heading">今天，也是被喜欢的小狗。</strong><p id="affection-copy">不需要打卡，有空来看看就很好。</p></div><span class="companionship-heart" aria-hidden="true">♡</span></div>
+        <div class="pet-memory"><div class="memory-heading"><div><span class="pet-eyebrow">OUR LITTLE MOMENTS</span><h3>相处的小事</h3></div><button type="button" id="memory-toggle" aria-expanded="false" aria-controls="memory-list" hidden>多看一点 <span aria-hidden="true">↗</span></button></div><div id="memory-list" aria-label="最近的陪伴记录"></div></div>
       </section>
     </div>
-    <div class="pet-bottom"><span><span aria-hidden="true">✧</span> 你忙的时候，它也会好好等你。</span><button id="install-button">放到手机桌面 <span aria-hidden="true">↗</span></button></div>
+    <div class="pet-bottom"><span><span aria-hidden="true">♡</span> 你忙的时候，它也会好好等你。</span><button id="install-button">把陪伴放到桌面 <span aria-hidden="true">↗</span></button></div>
   </main>
-  <footer class="pet-footer pet-wrap"><span>属于 Kali 和小黑的小世界</span><span>小小陪伴，长长久久 ♡</span></footer>
-
-  <dialog class="pet-dialog" id="pet-dialog" aria-labelledby="dialog-heading"><button class="dialog-close" id="dialog-close" aria-label="关闭">×</button><span class="pet-eyebrow">OUR LITTLE HOME</span><h2 id="dialog-heading">给小狗一个名字</h2><form id="rename-form"><label for="pet-name-input">宝宝想叫它什么呢？</label><div class="rename-row"><input id="pet-name-input" name="pet-name" maxlength="12" autocomplete="off" required placeholder="小黑"><button class="button button-primary" type="submit">就叫这个</button></div></form><div class="install-help"><h3>把小狗放到手机桌面</h3><p>iPhone：用 Safari 打开，点「分享」，选择「添加到主屏幕」。</p><p>Android：用 Chrome 打开，在菜单里选择「安装应用」或「添加到主屏幕」。</p><small>需要先用上线后的 HTTPS 网址打开一次。添加后可以像小 App 一样独立打开，离线也能陪你。</small></div><div class="data-note">小狗的状态只保存在当前浏览器。清除网站数据或换设备会重新开始，卸载浏览器前记得这一点哦。</div></dialog>
+  <footer class="pet-footer pet-wrap"><span>属于 Kali 和小黑的小世界</span><span>SMALL PAWS. SO MUCH LOVE. <span aria-hidden="true">♡</span></span></footer>
+  <dialog class="pet-dialog" id="pet-dialog" aria-labelledby="dialog-heading">
+    <button type="button" class="dialog-close" id="dialog-close" aria-label="关闭">×</button><span class="pet-eyebrow">OUR LITTLE HOME</span><h2 id="dialog-heading">给小狗一个名字</h2>
+    <form id="rename-form"><label for="pet-name-input">宝宝想叫它什么呢？</label><div class="rename-row"><input id="pet-name-input" name="pet-name" maxlength="24" autocomplete="off" required placeholder="小黑" aria-describedby="name-help"><button class="button button-primary" type="submit">就叫这个</button></div><small id="name-help">取一个喜欢的名字，最多 12 个字。</small></form>
+    <div class="install-help"><h3>把小狗放到手机桌面</h3><p>iPhone：用 Safari 打开，点「分享」，选择「添加到主屏幕」。</p><p>Android：用 Chrome 打开，在菜单里选择「安装应用」或「添加到主屏幕」。</p><small>联网打开一次，准备好离线模式后，就能像小 App 一样独立打开。</small></div><div class="data-note">小狗的状态只保存在当前浏览器。清除网站数据或换设备会重新开始，卸载浏览器前记得这一点哦。</div>
+  </dialog>
   <div class="toast" id="toast" role="status" hidden></div>
 </body>
 </html>

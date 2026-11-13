@@ -9,6 +9,7 @@ from threading import Thread
 from urllib.parse import urlsplit, unquote
 import json
 import math
+import re
 import mimetypes
 import time
 from playwright.sync_api import sync_playwright, expect
@@ -39,6 +40,7 @@ server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
 Thread(target=server.serve_forever,daemon=True).start()
 base=f'http://127.0.0.1:{server.server_port}/Freddy/'
 key='kali-little-dog-v1'
+expected_cache=re.search(r"const CACHE = '([^']+)'", (ROOT/'pet/sw.js').read_text())[1]
 errors=[]
 checks=[]
 with sync_playwright() as p:
@@ -121,7 +123,7 @@ with sync_playwright() as p:
     page.wait_for_function('window.littlePuppy !== undefined')
     expect(page.locator('#pet-name')).to_have_text('宝宝的小黑')
     expect(page.locator('#action-sleep')).to_have_attribute('aria-pressed','true')
-    assert page.evaluate('caches.keys()')==['kali-little-dog-v5']
+    assert page.evaluate('caches.keys()')==[expected_cache]
     page.locator('#action-sleep').click()
     page.wait_for_function('littlePuppy.inspect().state !== "sleeping"')
     ctx.set_offline(False)
@@ -147,12 +149,12 @@ with sync_playwright() as p:
     o.wait_for_function('navigator.serviceWorker.controller !== null')
     Handler.old_worker=False
     o.evaluate('navigator.serviceWorker.getRegistration().then(r=>r.update())')
-    o.wait_for_function('caches.keys().then(k=>k.includes("kali-little-dog-v5")&&!k.includes("kali-little-dog-v2"))')
+    o.wait_for_function('name => caches.keys().then(k=>k.includes(name)&&!k.includes("kali-little-dog-v2"))', arg=expected_cache)
     o.reload(wait_until='networkidle')
     expect(o.locator('#pet-name')).to_have_text('原来的小黑')
     preserved=o.evaluate(f'JSON.parse(localStorage.getItem("{key}"))')
     assert preserved['bornAt']==birth and preserved['affection']==40 and preserved['memories'][0]['text']=='和宝宝相处的记录。'
-    checks.append('v2 to v5 upgrade preserves name, birthday, affection and memories')
+    checks.append(f'v2 to {expected_cache} upgrade preserves name, birthday, affection and memories')
 
     old.close()
 

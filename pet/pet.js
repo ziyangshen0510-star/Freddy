@@ -3,6 +3,7 @@
 
   const $ = (selector) => document.querySelector(selector);
   const STORAGE_KEY = 'kali-little-dog-v1';
+  const SOUND_KEY = 'kali-little-dog-sound-v1';
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const HOUR = 3600000;
   const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
@@ -20,6 +21,8 @@
   let audio;
   let lastSpeechAt = 0;
   let speechTurn = 0;
+  let memoryExpanded = false;
+  try { soundEnabled = localStorage.getItem(SOUND_KEY) === 'on'; } catch { /* Sound stays off without storage. */ }
 
   function choose(lines, salt = 0) {
     const date = new Date();
@@ -35,7 +38,9 @@
   }
 
   function updateCompanionCopy() {
-    const hour = new Date().getHours();
+    const date = new Date();
+    const hour = date.getHours();
+    $('#greeting-date').textContent = date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'short' });
     const greetings = hour >= 5 && hour < 11 ? ['早安，宝宝。', '早安，来摸摸小黑。', '新的一天，一起慢慢来。']
       : hour < 14 && hour >= 11 ? ['午安，宝宝。', '午间也想和你贴贴。', '休息一下，小黑在呢。']
       : hour < 18 && hour >= 14 ? ['下午好，来坐坐吧。', '把下午留一点给小黑。', '今天，也陪宝宝一下。']
@@ -87,12 +92,17 @@
     } catch { /* Audio must never block care or animations. */ }
   }
 
-  $('#pet-sound-toggle').addEventListener('click', () => {
-    soundEnabled = !soundEnabled;
+  function renderSoundToggle() {
     $('#pet-sound-toggle').setAttribute('aria-pressed', String(soundEnabled));
     $('#pet-sound-toggle').setAttribute('aria-label', soundEnabled ? '关闭小狗音效' : '开启小狗音效');
     $('#pet-sound-toggle').title = soundEnabled ? '关闭小狗音效' : '开启小狗音效';
     $('#pet-sound-waves').setAttribute('d', soundEnabled ? 'M15 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14' : 'm16 9 5 6m0-6-5 6');
+  }
+  renderSoundToggle();
+  $('#pet-sound-toggle').addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    try { localStorage.setItem(SOUND_KEY, soundEnabled ? 'on' : 'off'); } catch { /* The current session still works. */ }
+    renderSoundToggle();
     playSound('happy');
     showToast(soundEnabled ? '轻轻的互动音效，打开啦。' : '音效已关闭。');
   });
@@ -117,7 +127,7 @@
         affection: typeof saved.affection === 'number' && Number.isFinite(saved.affection) ? clamp(saved.affection, 0, 9999) : 0,
         sleeping: saved.sleeping === true,
         bornAt: clamp(saved.bornAt, 0, now), updatedAt: clamp(saved.updatedAt, 0, now),
-        memories: Array.isArray(saved.memories) ? saved.memories.filter((item) => item && typeof item.text === 'string' && Number.isFinite(item.at)).slice(0, 3).map((item) => ({ text: item.text.slice(0, 80), at: clamp(item.at, 0, now) })) : [],
+        memories: Array.isArray(saved.memories) ? saved.memories.filter((item) => item && typeof item.text === 'string' && Number.isFinite(item.at)).slice(0, 12).map((item) => ({ text: item.text.slice(0, 80), at: clamp(item.at, 0, now) })) : [],
       };
     } catch {
       // Private browsing or a damaged save must not prevent playing.
@@ -161,6 +171,9 @@
     $('#pet-name').textContent = pet.name;
     $('#dog-touch').setAttribute('aria-label', `摸摸${pet.name}`);
     $('#pet-description').textContent = '一只喜欢宝宝的黑色拉布拉多';
+    $('#bond-label').textContent = pet.affection >= 100 ? '心有小默契' : pet.affection >= 50 ? '最熟悉的你' : pet.affection >= 15 ? '越来越亲近' : '初见也欢喜';
+    $('#care-hint').textContent = currentAction ? ({ stroke: '正在享受你的摸摸', feed: '认真吃饭的小狗', play: '快乐正在发生' })[currentAction]
+      : pet.sleeping ? '嘘，正在做个好梦' : pet.hunger < 55 ? '来一口小零食吧' : pet.energy < 40 ? '有点困，休息一下吧' : pet.mood < 65 ? '想和你贴贴一会儿' : '现在的它，心情很好';
     $('#room-status').textContent = pet.sleeping ? `${pet.name}在做美梦` : currentAction === 'play' ? `${pet.name}在追球` : currentAction === 'feed' ? `${pet.name}在吃东西` : `${pet.name}在家`;
     $('.room-bowl>span').textContent = pet.name.length > 4 ? '汪汪' : pet.name;
     $('#day-count').textContent = String(Math.max(1, Math.floor((Date.now() - pet.bornAt) / (24 * HOUR)) + 1));
@@ -169,7 +182,7 @@
     if (liveDog) liveDog.sleep(pet.sleeping);
     $('#action-sleep').setAttribute('aria-pressed', String(pet.sleeping));
     $('#sleep-action-label').textContent = pet.sleeping ? '起床' : '睡觉';
-    $('#sleep-action-hint').textContent = pet.sleeping ? '轻轻叫醒' : '充充电';
+    $('#sleep-action-hint').textContent = pet.sleeping ? '轻轻叫醒它' : '做个甜甜的梦';
     $('#room-bottom-note').textContent = pet.sleeping ? '让小狗休息一下，醒来再玩也很好' : liveDog ? '按住小狗轻轻摸，也可以拖动球球抛给它' : '点点小狗，也可以摸摸它哦';
     for (const key of ['hunger', 'mood', 'energy']) {
       const value = Math.round(pet[key]);
@@ -178,9 +191,21 @@
       $(`#${key}-meter>span`).style.width = `${value}%`;
     }
     updateCompanionCopy();
+    renderMemories();
+  }
+
+  function renderMemories() {
+    const more = $('#memory-toggle');
+    more.hidden = pet.memories.length <= 3;
+    more.setAttribute('aria-expanded', String(memoryExpanded));
+    more.replaceChildren(document.createTextNode(memoryExpanded ? '收起小事 ' : '多看一点 '));
+    const arrow = document.createElement('span');
+    arrow.setAttribute('aria-hidden', 'true');
+    arrow.textContent = memoryExpanded ? '↑' : '↗';
+    more.append(arrow);
     const list = $('#memory-list');
     list.replaceChildren();
-    pet.memories.forEach((item) => {
+    pet.memories.slice(0, memoryExpanded ? 12 : 3).forEach((item) => {
       const row = document.createElement('div');
       row.className = 'memory-row';
       const text = document.createElement('span');
@@ -188,6 +213,7 @@
       const time = document.createElement('time');
       time.dateTime = new Date(item.at).toISOString();
       time.textContent = memoryTime(item.at);
+      time.title = new Date(item.at).toLocaleString('zh-CN');
       row.append(text, time);
       list.append(row);
     });
@@ -195,8 +221,13 @@
 
   function remember(text) {
     pet.memories.unshift({ text, at: Date.now() });
-    pet.memories = pet.memories.slice(0, 3);
+    pet.memories = pet.memories.slice(0, 12);
   }
+
+  $('#memory-toggle').addEventListener('click', () => {
+    memoryExpanded = !memoryExpanded;
+    renderMemories();
+  });
 
   function hearts() {
     if (reducedMotion.matches) return;
@@ -218,6 +249,12 @@
     document.querySelectorAll('#action-stroke,#action-feed,#action-play,#dog-touch,#food-bowl,#toy-ball').forEach((button) => { button.disabled = value; });
     // Rest can interrupt a game; the user is never trapped in an animation.
     $('#action-sleep').disabled = false;
+    for (const [action, hint] of Object.entries({ stroke: '把喜欢给你', feed: '一口小满足', play: '快乐蹦蹦跳' })) {
+      const button = $(`#action-${action}`);
+      const active = value && currentAction === action;
+      button.dataset.active = String(active);
+      button.querySelector('small').textContent = active ? ({ stroke: '贴贴中…', feed: '吃饭中…', play: '追球中…' })[action] : hint;
+    }
   }
 
   function animateFallback(className, duration) {

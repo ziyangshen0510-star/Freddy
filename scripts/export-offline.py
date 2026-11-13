@@ -21,7 +21,7 @@ def image(match):
 
 body = re.sub(r'src="(\.?\.?/[^"?#]+)"', image, body)
 body = body.replace('href="./"', 'href="#"')
-body = body.replace('放到手机桌面 <span aria-hidden="true">↗</span>', '使用说明 <span aria-hidden="true">↗</span>')
+body = body.replace('把陪伴放到桌面 <span aria-hidden="true">↗</span>', '使用说明 <span aria-hidden="true">↗</span>')
 body = re.sub(r'<div class="install-help">.*?</div>', '<div class="install-help"><h3>小黑陪你 · 独立文件版</h3><p>在电脑浏览器中打开即可。名字和状态保存在当前浏览器，请用同一个浏览器继续玩。</p><p>iPhone 添加到主屏幕，请使用正式的 HTTPS 网站。</p></div>', body, flags=re.S)
 css = (ROOT / 'styles.css').read_text() + '\n' + (ROOT / 'pet/pet.css').read_text() + '\n' + (ROOT / 'pet/room-style.css').read_text()
 script = (ROOT / 'pet/pet.js').read_text()

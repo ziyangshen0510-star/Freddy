@@ -29,6 +29,8 @@
   function apply(value) {
     const style = normalize(value);
     for (const key of Object.keys(options)) room.dataset[key] = style[key];
+    const caption = document.querySelector('#room-style-caption');
+    if (caption) caption.textContent = `${({ mint: '薄荷小窝', peach: '奶油落日', night: '星星夜' })[style.roomTheme]} · ${({ oval: '编织地毯', gingham: '格纹地毯', cloud: '云朵地毯' })[style.roomRug]}`;
   }
 
   let saved = readSaved();
@@ -46,10 +48,11 @@
 
   const entry = document.createElement('div');
   entry.className = 'room-decor-entry';
-  entry.innerHTML = '<button type="button" class="room-decor-launch" aria-haspopup="dialog" aria-controls="room-decor-dialog"><span class="room-decor-launch-icon" aria-hidden="true">⌂</span><span><strong>布置小窝</strong><small>换个地毯，添一点喜欢的小物</small></span><span class="room-decor-launch-arrow" aria-hidden="true">↗</span></button>';
+  entry.innerHTML = '<button type="button" class="room-decor-launch" aria-haspopup="dialog" aria-controls="room-decor-dialog"><span class="room-decor-launch-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="m5 14 11-9 11 9M8 12v15h16V12M13 27v-9h6v9"/></svg></span><span><strong>布置小窝</strong><small>把喜欢的颜色，装进我们的小日子</small></span><span class="room-decor-launch-arrow" aria-hidden="true">↗</span></button>';
   if (companion) companion.after(entry);
   else memories.before(entry);
   const launch = entry.querySelector('button');
+  let opener = launch;
 
   const dialog = document.createElement('dialog');
   dialog.id = 'room-decor-dialog';
@@ -89,18 +92,21 @@
 
   function restore() {
     apply(saved);
-    launch.focus({ preventScroll: true });
+    opener.focus({ preventScroll: true });
   }
 
-  launch.addEventListener('click', () => {
+  function openDecor(event) {
     if (dialog.open) return;
+    opener = event.currentTarget;
     for (const input of form.querySelectorAll('input[type="radio"]')) {
       input.checked = saved[input.name] === input.value;
     }
     apply(saved);
     dialog.returnValue = '';
     dialog.showModal();
-  });
+  }
+  launch.addEventListener('click', openDecor);
+  document.querySelector('#room-style-shortcut')?.addEventListener('click', openDecor);
   form.addEventListener('input', () => { apply(selection()); });
   form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -114,7 +120,8 @@
   });
   dialog.querySelector('.room-decor-cancel').addEventListener('click', () => { dialog.close('cancelled'); });
   dialog.querySelector('.room-decor-close').addEventListener('click', () => { dialog.close('cancelled'); });
-  // Escape uses the native cancel/close flow; every close restores the saved style.
+  // Revert Escape's preview immediately, before the native close event is queued.
+  dialog.addEventListener('cancel', () => { apply(saved); });
   dialog.addEventListener('close', restore);
   let backdropPress = false;
   function outside(event) {

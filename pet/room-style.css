@@ -1,40 +1,41 @@
-/* Room decoration is independent of puppy state, canvas, and care controls. */
-.room-decor-entry{margin:-10px 0 23px}
-.room-decor-launch{display:flex;align-items:center;gap:11px;width:100%;min-height:62px;padding:10px 13px;text-align:left;border:1px dashed #ced9bd;border-radius:9px;background:#f4f5e9;color:#627955;touch-action:manipulation}
-.room-decor-launch-icon{font-size:29px;line-height:1;color:#a4916f;flex:none}
-.room-decor-launch strong{display:block;font-size:12px;font-weight:500;letter-spacing:.5px}
-.room-decor-launch small{display:block;margin-top:4px;color:#7b8b6e;font-size:10px;line-height:1.7}
+/* Decor choices preview without changing the puppy's saved state. */
+.room-decor-entry{margin:0 0 20px}
+.room-decor-launch{display:flex;align-items:center;gap:12px;width:100%;min-height:70px;padding:13px 14px;text-align:left;border:1px dashed #ccd7bb;border-radius:12px;background:#f8f9f0;color:#627955;touch-action:manipulation;transition:background .2s,border-color .2s}
+.room-decor-launch:hover{background:#edf2e1;border-color:#adbf94}
+.room-decor-launch-icon{display:grid;place-items:center;width:36px;height:36px;border:1px solid #e3e2cc;border-radius:10px;background:#f2efe1;color:#a39470;flex:none}
+.room-decor-launch-icon svg{width:24px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.room-decor-launch strong{display:block;font-size:12px;font-weight:500;letter-spacing:.6px}
+.room-decor-launch small{display:block;margin-top:5px;color:#7b8b6e;font-size:10px;line-height:1.7}
 .room-decor-launch-arrow{margin-left:auto;font-size:20px;color:#94a383}
-.room-decor-launch:hover{background:#edf1df}
 .room-decor-launch:focus-visible,.room-decor-dialog button:focus-visible{outline:2px solid #829968;outline-offset:3px}
-.room-decor-dialog{box-sizing:border-box;width:min(410px,calc(100% - 24px));max-height:85vh;max-height:85dvh;margin:auto;padding:25px 23px 20px;border:1px solid #d4dec7;border-radius:17px;background:#fffef5;color:#4f6547;box-shadow:0 18px 70px #2d3b3529;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-.room-decor-dialog::backdrop{background:#34453b38;backdrop-filter:blur(2px)}
+.room-decor-dialog{box-sizing:border-box;width:min(450px,calc(100% - 28px));max-height:85vh;max-height:85dvh;margin:auto;padding:30px 27px 24px;border:1px solid #d4dec7;border-radius:22px;background:#fffef7;color:#4f6547;box-shadow:0 20px 80px #2d3b3529;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.room-decor-dialog::backdrop{background:#34453b4d;backdrop-filter:blur(6px)}
 .room-decor-dialog .room-decor-close{position:absolute;top:7px;right:8px;display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;background:transparent;color:#81916f;font-size:28px;line-height:1}
-.room-decor-eyebrow{margin:0 35px 9px 0;font-size:8px;letter-spacing:1px;color:#8a987a}
-.room-decor-dialog h2{margin:0;font-family:var(--serif,serif);font-size:24px;font-weight:500;letter-spacing:1px}
-.room-decor-description{margin:9px 0 20px;color:#7b8b6c;font-size:11px;line-height:1.9}
-.room-decor-form fieldset{min-width:0;margin:0 0 17px;padding:0;border:0}
-.room-decor-form legend{margin:0 0 8px;padding:0;font-size:12px;letter-spacing:.4px;color:#657955}
-.room-decor-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.room-decor-choice{position:relative;display:flex;min-width:0;min-height:77px;box-sizing:border-box;flex-direction:column;justify-content:flex-end;align-items:center;gap:8px;padding:12px 5px 9px;border:1px solid #dfe5d1;border-radius:9px;background:#f7f8ef;color:#647851;cursor:pointer;font-size:12px;line-height:1.5;touch-action:manipulation}
-.room-decor-choice input{position:absolute;top:7px;right:7px;width:15px;height:15px;margin:0;accent-color:#71865c;cursor:pointer}
-.room-decor-choice:has(input:checked){border-color:#91a578;background:#eaf0dc;box-shadow:inset 0 0 0 1px #91a578}
+.room-decor-eyebrow{margin:0 35px 11px 0;font-size:8px;letter-spacing:1.3px;color:#7c8b6c}
+.room-decor-dialog h2{margin:0;font:500 27px var(--serif,serif);letter-spacing:1px}
+.room-decor-description{margin:10px 0 23px;color:#788969;font-size:12px;line-height:1.9}
+.room-decor-form fieldset{min-width:0;margin:0 0 20px;padding:0;border:0}
+.room-decor-form legend{margin:0 0 10px;padding:0;font-size:13px;letter-spacing:.4px;color:#657955}
+.room-decor-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.room-decor-choice{position:relative;display:flex;min-width:0;min-height:88px;box-sizing:border-box;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;padding:15px 5px 11px;border:1px solid #dfe5d1;border-radius:11px;background:#f8f9f1;color:#647851;cursor:pointer;font-size:12px;line-height:1.5;touch-action:manipulation;transition:background .2s,border-color .2s}
+.room-decor-choice input{position:absolute;top:7px;right:7px;width:16px;height:16px;margin:0;accent-color:#71865c;cursor:pointer}
+.room-decor-choice:has(input:checked){border-color:#91a578;background:#edf2e1;box-shadow:inset 0 0 0 1px #91a578}
 .room-decor-choice:has(input:focus-visible){outline:2px solid #71865c;outline-offset:3px}
 .room-decor-choice input:focus-visible{outline:2px solid #71865c;outline-offset:3px}
-.room-decor-swatch{display:block;width:35px;height:23px;margin-right:5px;border-radius:6px;box-shadow:inset 0 0 0 1px #78866a1c;flex:none}
+.room-decor-swatch{display:block;width:39px;height:26px;margin-right:5px;border-radius:6px;box-shadow:inset 0 0 0 1px #78866a1c;flex:none}
 .room-decor-swatch-mint{background:linear-gradient(140deg,#edf2df 55%,#b5cbb4 56%)}
 .room-decor-swatch-peach{background:linear-gradient(140deg,#f7e7d0 55%,#e6bda1 56%)}
 .room-decor-swatch-night{background:radial-gradient(circle at 75% 28%,#f5e5b4 0 3px,transparent 4px),linear-gradient(140deg,#d7dce6 55%,#859bb4 56%)}
 .room-decor-swatch-oval{border-radius:50%;background:repeating-radial-gradient(ellipse at center,#bfcca8 0 2px,#dce4ca 3px 5px)}
 .room-decor-swatch-gingham{background:repeating-linear-gradient(0deg,#d1a99850 0 6px,transparent 6px 12px),repeating-linear-gradient(90deg,#d1a99860 0 6px,#f8ecdc 6px 12px);border-radius:4px}
 .room-decor-swatch-cloud{border-radius:50% 50% 38% 42%;background:#fffdf1;box-shadow:inset 0 0 0 1px #d1dcc7,5px -3px 0 -1px #fffdf1,-4px 0 0 #fffdf1}
-.room-decor-swatch-item{font-size:30px;line-height:23px;text-align:center;color:#94aa7d;box-shadow:none}
+.room-decor-swatch-item{font-size:30px;line-height:26px;text-align:center;color:#94aa7d;box-shadow:none}
 .room-decor-swatch-lamp{color:#c5a270}
 .room-decor-swatch-stars{font-size:25px;color:#a5a1c0}
-.room-decor-actions{display:grid;grid-template-columns:1fr 1.6fr;gap:10px;margin-top:3px}
-.room-decor-actions button{min-height:45px;padding:10px 12px;border:1px solid #d4dec7;border-radius:8px;font:inherit;font-size:12px;letter-spacing:.5px;touch-action:manipulation}
+.room-decor-actions{display:grid;grid-template-columns:1fr 1.6fr;gap:10px;margin-top:7px}
+.room-decor-actions button{min-height:46px;padding:12px;border:1px solid #d4dec7;border-radius:10px;font:inherit;font-size:13px;letter-spacing:.5px;touch-action:manipulation}
 .room-decor-cancel{background:#f6f7ec;color:#758466}
-.room-decor-save{background:#768c60;color:#fffef5;border-color:#768c60!important}
+.room-decor-save{background:#71865d;color:#fffef5;border-color:#71865d!important}
 #pet-room[data-room-theme="mint"]{--decor-wall:linear-gradient(110deg,#f2f4e7,#e0e9d8 72%,#d6e2cf);--decor-floor-light:#f5eddc;--decor-floor:#e0e5d0;--decor-window:linear-gradient(#bad9cd,#eef3df);--decor-rug:#ccd8b7;--decor-rug-edge:#e0e8d2}
 #pet-room[data-room-theme="peach"]{--decor-wall:linear-gradient(110deg,#fff2df,#f0d9c7 72%,#e9ccbd);--decor-floor-light:#fbecd5;--decor-floor:#e7d4be;--decor-window:linear-gradient(#e5b5a2,#f7e8c7);--decor-rug:#d8bda8;--decor-rug-edge:#f2e2cb}
 #pet-room[data-room-theme="night"]{--decor-wall:linear-gradient(110deg,#e7e8ee,#cbd5e1 72%,#bdccdc);--decor-floor-light:#e9e4e8;--decor-floor:#c9d3da;--decor-window:linear-gradient(#7189a7,#a9b9cd);--decor-rug:#b9c3d3;--decor-rug-edge:#dce1e9}
@@ -70,6 +71,12 @@
 #pet-room .room-decor-stars>span:nth-child(2):before{height:62px}
 #pet-room .room-decor-stars>span:nth-child(3){top:23px;left:51px;font-size:21px}
 #pet-room .room-decor-stars>span:nth-child(3):before{height:23px}
-@media(max-width:760px){.room-decor-entry{margin:-10px 0 22px}#pet-room[data-room-item="lamp"] .room-decor-lamp{right:14px;transform:scale(.8);transform-origin:bottom}#pet-room[data-room-item="stars"] .room-decor-stars{top:29%;right:8%;transform:scale(.75) rotate(4deg);transform-origin:top right}}
-@media(max-width:360px){.room-decor-dialog{padding:23px 16px 17px}.room-decor-description{font-size:10px;margin-bottom:17px}.room-decor-choices{gap:6px}.room-decor-choice{font-size:11px;min-height:75px}.room-decor-form fieldset{margin-bottom:15px}.room-decor-launch small{font-size:9px}}
+@media(max-width:760px){.room-decor-entry{margin:0 0 20px}.room-decor-launch{padding:12px;gap:10px}.room-decor-launch small{font-size:9px}.room-decor-dialog{padding:27px 22px 22px}.room-decor-description{font-size:11px}#pet-room[data-room-item="lamp"] .room-decor-lamp{right:14px;transform:scale(.8);transform-origin:bottom}#pet-room[data-room-item="stars"] .room-decor-stars{top:29%;right:8%;transform:scale(.75) rotate(4deg);transform-origin:top right}}
+@media(max-width:360px){.room-decor-dialog{padding:23px 16px 17px}.room-decor-description{font-size:11px;margin-bottom:17px}.room-decor-choices{gap:6px}.room-decor-choice{font-size:11px;min-height:75px}.room-decor-form fieldset{margin-bottom:15px}.room-decor-launch small{font-size:9px}}
 @media(prefers-reduced-motion:reduce){#pet-room[data-room-theme],#pet-room[data-room-theme] .room-wall,#pet-room[data-room-theme] .room-window{transition:none}}
+
+#pet-room[data-room-theme="night"] .room-sunbeam{opacity:.12}
+#pet-room[data-room-theme="night"] .room-heading-title{color:#62738b}
+#pet-room[data-room-theme="night"] .window-curtain{opacity:.65}
+#pet-room[data-room-theme="night"] .room-shelf{background:#b6b3ad}
+#pet-room[data-room-theme="peach"] .room-heading-title{color:#94755e}
