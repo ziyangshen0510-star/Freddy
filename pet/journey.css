@@ -1,0 +1,99 @@
+/* Little goals with visible, lasting rewards. */
+.journey-growth{padding:18px 0 19px;border-bottom:1px solid #e8ebdf}
+.journey-growth-heading{display:flex;align-items:center;gap:9px;min-width:0}
+.journey-level-pill{flex-shrink:0;background:#eaf0dc;border:1px solid #d6e1c3;color:#718951;border-radius:6px;padding:4px 7px;font:10px Georgia,serif;white-space:nowrap}
+.journey-level-pill strong{font-size:15px;font-weight:500;margin-left:2px}
+#journey-level-label{font-size:12px;color:#60734e;letter-spacing:.4px;font-weight:500}
+#journey-album-open{background:none;border:0;margin-left:auto;padding:8px 0 8px 6px;min-height:36px;font-size:10px;color:#7d8b6c;white-space:nowrap}
+#journey-album-open>span{margin-left:4px;font-size:13px}
+.journey-progress-label{display:flex;justify-content:space-between;color:#879475;font-size:9px;letter-spacing:.4px;margin:9px 0 8px}
+#journey-xp{font-variant-numeric:tabular-nums;letter-spacing:.8px}
+.journey-progress{height:5px;background:#edf0e5;overflow:hidden;border-radius:5px}
+.journey-progress>span{display:block;height:100%;background:linear-gradient(90deg,#b7c79c,#829f63);border-radius:5px;transition:width .7s ease}
+.training-launch{display:flex;align-items:center;gap:11px;width:100%;min-height:74px;border:1px solid #dfdfcb;border-radius:12px;background:linear-gradient(115deg,#f5f2e5,#fbf9ef);padding:13px 12px;text-align:left;color:#7e805b;margin-top:13px;transition:background .2s,transform .2s,border-color .2s}
+.training-launch:not(:disabled):hover{transform:translateY(-2px);border-color:#bdc8a5;background:#f1f0de}
+.training-launch:disabled{opacity:.58}
+.training-paw{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#ebe8d7;border:1px solid #e4dfc9;flex-shrink:0}
+.training-paw svg{width:23px;fill:none;stroke:#a9a27e;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.training-launch-copy{min-width:0;flex:1}
+.training-launch strong{font-size:12px;font-weight:500;line-height:1.9;display:block;color:#6c7d53}
+#training-label{font-size:9px;color:#949273;margin-left:5px;font-weight:400}
+.training-launch small{display:block;font-size:10px;line-height:1.8;color:#8c9074;margin-top:3px}
+.training-launch-arrow{color:#9aab83;font-size:20px;margin-left:auto}
+.journey-feedback{font-size:10px;line-height:1.9;color:#7a8c60;margin:10px 2px 0;min-height:19px;overflow-wrap:anywhere}
+.daily-card{border:1px solid #dce3cf;border-radius:18px;background:#fffef7b8;margin-top:19px;padding:22px 22px 16px;box-shadow:0 6px 20px #4e613504}
+.daily-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.daily-heading .pet-eyebrow{font-size:7px;letter-spacing:1.5px}
+.daily-heading h2{font:500 21px var(--serif);letter-spacing:.5px;color:#5e7550;margin:7px 0 0}
+.daily-count{font:italic 20px Georgia,serif;color:#8b9b70;letter-spacing:2px;background:#edf1e2;border:1px solid #e0e7d2;border-radius:50%;width:54px;height:54px;display:grid;place-items:center;flex-shrink:0}
+.daily-tasks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:20px 0 15px}
+.daily-tasks>button{position:relative;min-width:0;display:flex;align-items:center;gap:8px;padding:12px 10px 12px;border:1px solid #e4e8d9;border-radius:11px;background:#f8faf1;text-align:left;transition:background .2s,transform .2s,border-color .2s}
+.daily-tasks>button:hover:not(:disabled){background:#eef3e1;border-color:#bccba6;transform:translateY(-2px)}
+.daily-tasks>button:disabled{opacity:.6}
+.daily-tasks>button[data-done="true"]{background:#edf3e0;border-color:#d4dfc1}
+.daily-task-icon{font:25px Georgia,serif;color:#9aae80;line-height:1;flex-shrink:0}
+.daily-task-copy{min-width:0}
+.daily-task-copy strong{display:block;font-size:10px;font-weight:500;color:#6d8158;line-height:1.8;overflow-wrap:anywhere}
+.daily-task-copy small{display:block;font-size:9px;color:#909e7b;line-height:1.7;margin-top:3px}
+.daily-task-check{color:#8aa36d;font-size:12px;position:absolute;right:5px;top:5px;line-height:1}
+#daily-gift{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;min-height:43px;padding:10px 12px;background:#f2f1e6;border:1px solid #e2e1ce;border-radius:10px;color:#a29e83;font-size:11px;letter-spacing:.3px;line-height:1.8}
+#daily-gift>span:first-child{font:20px Georgia,serif}
+#daily-gift>span:last-child{margin-left:auto;font-size:15px}
+#daily-gift[data-ready="true"]{color:#fffef5;background:#7d9466;border-color:#7d9466;box-shadow:0 3px 8px #7d94661f}
+#daily-gift[data-ready="true"]:hover{background:#6d8556}
+.daily-note{font-size:9px;color:#8c987c;text-align:center;line-height:1.8;margin:10px 0 0;letter-spacing:.2px}
+.training-game{position:absolute;bottom:6%;left:7%;right:7%;z-index:6;padding:16px 18px;border:1px solid #fffef4;border-radius:16px;background:#fffdf3f5;box-shadow:0 8px 35px #4c5c3630;backdrop-filter:blur(10px);color:#667b52}
+.training-game-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;font:17px var(--serif);letter-spacing:.5px}
+#training-cancel{width:32px;height:32px;flex-shrink:0;display:grid;place-items:center;font-size:24px;color:#83966c;border:0;background:transparent;line-height:1;padding:0}
+.training-game p{font-size:10px;color:#889578;line-height:1.8;letter-spacing:.2px;margin:4px 0 14px}
+.training-timing{position:relative;height:9px;background:#e9e4d4;border-radius:10px;box-shadow:inset 0 1px 3px #5a623215;margin:0 5px 17px}
+.training-target{position:absolute;left:40%;width:30%;height:100%;background:#b1c98c;box-shadow:0 0 0 4px #dfe9ca80}
+#training-marker{position:absolute;left:0;top:50%;width:14px;height:14px;border:3px solid #fffdf5;background:#9eaa7f;box-shadow:0 1px 5px #53683433;transform:translate(-50%,-50%);border-radius:50%}
+#training-hand{width:100%;min-height:43px;border:1px solid #8ba16f;border-radius:10px;background:#8ba16f;color:#fffef4;font-size:12px;letter-spacing:.6px;padding:10px}
+#training-hand:hover{background:#7a9160}
+.interaction-reward{position:absolute;left:50%;top:56%;max-width:85%;z-index:5;transform:translate(-50%,-50%);background:#fffdf3f5;border:1px solid #fcfff1;border-radius:20px;padding:10px 19px;color:#6b8150;font-size:13px;font-weight:500;letter-spacing:.7px;box-shadow:0 6px 20px #56683724;pointer-events:none;white-space:nowrap}
+.interaction-reward.is-celebrating{animation:little-reward 2.8s ease both}
+@keyframes little-reward{0%{opacity:0;transform:translate(-50%,-20%) scale(.9)}15%,75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-90%)}}
+.is-training .dog-motion{animation:puppy-handshake 1.8s ease}
+@keyframes puppy-handshake{25%,60%{transform:rotate(-4deg) translateY(-4px) scale(1.015)}45%{transform:rotate(2deg) translateY(-3px)}}
+.journey-dialog{width:min(550px,calc(100% - 28px));max-height:86vh;max-height:86dvh;overflow-y:auto;overscroll-behavior:contain;background:#fffef6;border:1px solid #dce4cf;color:#60764e;padding:32px;border-radius:22px;box-shadow:0 20px 80px #34453b29}
+.journey-dialog::backdrop{background:#34453b50;backdrop-filter:blur(6px)}
+.journey-dialog-close{position:absolute;top:8px;right:8px;display:grid;place-items:center;width:44px;height:44px;background:transparent;border:0;color:#81936f;font-size:28px;line-height:1}
+.journey-dialog>.pet-eyebrow{font-size:8px;letter-spacing:1.4px;display:block;margin-right:24px}
+.journey-dialog h2{font:500 25px var(--serif);letter-spacing:.7px;line-height:1.7;margin:14px 0 8px;overflow-wrap:anywhere}
+.journey-dialog-subtitle{font-size:11px;line-height:1.9;color:#8b967b;margin:0 0 25px}
+.journey-dialog h3{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:500;letter-spacing:.5px;margin:21px 0 13px}
+#badge-count{font:italic 14px Georgia,serif;color:#8d9c75}
+.journey-badges{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.journey-badge{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:17px 11px 12px;text-align:center;border:1px dashed #dfe4d6;border-radius:12px;background:#f6f7ef;color:#9aa28c}
+.journey-badge[data-unlocked="true"]{background:#f1f5e6;border-style:solid;border-color:#d5dfbf;color:#748956}
+.journey-badge-icon{width:42px;height:42px;display:grid;place-items:center;border:1px solid #dce3d2;border-radius:50%;background:#eeefe5;font:27px Georgia,serif;margin-bottom:3px}
+.journey-badge[data-unlocked="true"] .journey-badge-icon{border-color:#c5d5ac;background:#e5edda;color:#8da36e;box-shadow:0 0 0 4px #eaf0e0}
+.journey-badge strong{font-size:11px;font-weight:500;letter-spacing:.3px;line-height:1.7}
+.journey-badge small{font-size:9px;line-height:1.8;color:#8f9b7d}
+.journey-badge-status{font-size:8px;letter-spacing:.5px;margin-top:3px;color:#a0a78f}
+.journey-badge[data-unlocked="true"] .journey-badge-status{color:#8a9d6c}
+.wardrobe-note{font-size:11px;line-height:1.9;color:#879577;margin:0 0 13px}
+.journey-wardrobe{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.journey-wardrobe>button{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;padding:15px 4px 12px;background:#f7f8ef;border:1px solid #dfe5d4;border-radius:11px;color:#758961}
+.journey-wardrobe>button[aria-pressed="true"]{border-color:#a5b98b;background:#eaf0dc;box-shadow:inset 0 0 0 1px #a5b98b}
+.journey-wardrobe>button:disabled{opacity:.45}
+.journey-wardrobe strong{font-size:11px;font-weight:500;line-height:1.8}
+.journey-wardrobe small{font-size:8px;line-height:1.7;white-space:nowrap}
+.scarf-swatch{width:38px;height:31px;background:linear-gradient(145deg,#ffffff44,transparent 65%),var(--swatch-color);clip-path:polygon(0 0,100% 0,92% 20%,52% 100%,8% 20%);filter:drop-shadow(0 2px 0 #0000000a)}
+.daily-gift-dialog{text-align:center;width:min(400px,calc(100% - 28px));padding-block:35px}
+.daily-gift-dialog>.pet-eyebrow{font-size:7px;letter-spacing:1.1px;margin:0}
+.daily-gift-dialog h2{font-size:24px;margin-top:16px}
+.daily-gift-dialog p{font-size:12px;line-height:2;color:#7e8d6c}
+.gift-illustration{position:relative;margin:28px auto 20px;width:98px;height:98px;border:1px solid #e5e4d1;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#b0a272;background:#f5f1e3;box-shadow:0 0 0 8px #f8f6ed;font:25px Georgia,serif;gap:5px}
+.gift-illustration>span{display:block;width:45px;height:40px;transform:rotate(-12deg);background:linear-gradient(145deg,#ffffff44,transparent 65%),var(--gift-color,#e4ad96);clip-path:polygon(0 0,100% 0,90% 20%,50% 100%,10% 20%)}
+.daily-gift-dialog .gift-next{font-size:10px;color:#a29d7d;margin-top:16px;padding-top:15px;border-top:1px dashed #e3e5d7}
+#daily-gift-close{width:100%;margin-top:10px;min-height:45px;border-radius:10px;border:1px solid #81996a;background:#81996a;color:#fffdf4;font-size:12px;letter-spacing:.5px;padding:12px}
+@media(min-width:761px) and (max-width:1050px){.daily-card{padding:20px 17px 15px}.daily-tasks{gap:6px}.daily-tasks>button{flex-direction:column;align-items:flex-start;padding:13px 9px 10px;gap:7px}.daily-task-copy strong{font-size:10px}.journey-growth-heading{flex-wrap:wrap;gap:5px}#journey-album-open{font-size:9px}#journey-level-label{font-size:11px}.training-launch{gap:8px}.training-launch strong{font-size:11px}#training-label{display:block;font-size:9px;margin-left:0}.training-launch small{font-size:9px}}
+@media(max-width:760px){.daily-card{margin-top:13px;padding:19px 16px 14px;border-radius:16px}.daily-heading h2{font-size:19px}.daily-heading .pet-eyebrow{font-size:6px;letter-spacing:1.2px}.daily-count{font-size:18px;width:45px;height:45px}.daily-tasks{gap:7px;margin:16px 0 12px}.daily-tasks>button{flex-direction:column;align-items:flex-start;padding:13px 9px 10px;gap:7px;min-height:103px}.daily-task-icon{font-size:24px}.daily-task-copy strong{font-size:10px}.daily-task-copy small{font-size:8px}.daily-note{font-size:8px;margin-top:9px}#daily-gift{font-size:10px;padding:9px;gap:7px}.journey-growth{padding:14px 0 16px}.journey-growth-heading{gap:7px}#journey-level-label{font-size:11px}#journey-album-open{font-size:9px;min-height:36px}.journey-progress-label{font-size:9px;margin-top:8px}.training-launch{padding:12px 10px;gap:9px}.training-launch strong{font-size:11px}#training-label{font-size:8px;letter-spacing:0;margin-left:4px}.training-launch small{font-size:9px}.journey-feedback{font-size:9px;margin-top:9px}.training-game{bottom:5%;left:6%;right:6%;padding:12px 14px;border-radius:13px}.training-game-heading{font-size:15px;letter-spacing:.3px}.training-game p{font-size:9px;margin:2px 0 12px}.training-timing{height:7px;margin-bottom:14px}#training-hand{min-height:40px;font-size:11px}#training-cancel{width:32px;height:32px}.interaction-reward{font-size:11px;top:54%;padding:9px 15px}.journey-dialog{padding:29px 21px 23px}.journey-dialog h2{font-size:23px}.journey-dialog>.pet-eyebrow{font-size:7px;letter-spacing:1px}.journey-dialog-subtitle{font-size:10px}.journey-badges{gap:8px}.journey-badge{padding:15px 9px 11px}.journey-badge strong{font-size:11px}.journey-badge small{font-size:9px}.journey-wardrobe{gap:6px}.journey-wardrobe>button{gap:7px;padding:12px 3px 10px}.scarf-swatch{width:32px;height:28px}.journey-wardrobe strong{font-size:10px}.journey-wardrobe small{font-size:7px}.daily-gift-dialog{padding:29px 24px}.daily-gift-dialog>.pet-eyebrow{font-size:6px;letter-spacing:.7px}.daily-gift-dialog h2{font-size:22px}.daily-gift-dialog p{font-size:11px}.gift-illustration{width:86px;height:86px}}
+@media(max-width:370px){.journey-growth-heading{gap:5px}#journey-level-label{font-size:10px}.journey-level-pill{padding:4px 5px;font-size:9px}.journey-level-pill strong{font-size:13px}#journey-album-open{font-size:8px}.training-launch strong{font-size:11px}#training-label{display:block;margin-left:0}.daily-card{padding:17px 13px 13px}.daily-heading h2{font-size:18px}.daily-tasks{gap:6px}.daily-tasks>button{padding-inline:8px;min-height:105px}.daily-task-copy strong{font-size:9px}.daily-task-copy small{font-size:7px}#daily-gift{font-size:9px;gap:4px}.training-game{left:5%;right:5%;padding:9px 11px}.training-game-heading{font-size:14px}.training-game p{font-size:8px}.training-timing{margin-bottom:11px}#training-hand{font-size:10px;min-height:36px}.journey-dialog{padding-inline:17px}.journey-dialog h2{font-size:21px}.journey-wardrobe small{font-size:6px}.journey-badge small{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.interaction-reward.is-celebrating{animation:none}.journey-progress>span,.training-launch,.daily-tasks>button{transition:none}}
+.daily-count{white-space:nowrap;flex:none}
+@media(max-width:760px){.daily-count{width:48px;height:48px;font-size:17px;letter-spacing:1px}}
+#training-cancel{width:44px;height:44px}
+.journey-dialog .journey-save-warning{font-size:11px;line-height:1.9;background:#f4ead9;border:1px solid #e6d9bd;color:#8b7650;border-radius:9px;padding:10px 12px;margin:12px 0;text-align:left}

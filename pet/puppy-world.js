@@ -69,6 +69,13 @@ function createWorld() {
   const pink = new THREE.MeshPhysicalMaterial({ color: 0xc88683, roughness: 0.47, clearcoat: 0.25 });
   const scarf = new THREE.MeshStandardMaterial({ color: 0xa2b797, roughness: 1, side: THREE.DoubleSide });
   const scarfLight = new THREE.MeshStandardMaterial({ color: 0xb8c8a7, roughness: 1, side: THREE.DoubleSide });
+  const scarfPalette = Object.freeze({
+    sage: [0xa2b797, 0xb8c8a7],
+    peach: [0xd5977a, 0xefbea2],
+    sky: [0x7fadd1, 0xafcee7],
+    gold: [0xc9a14f, 0xefcd80],
+  });
+  let scarfId = 'sage';
 
   const sphere = new THREE.SphereGeometry(1, 24, 18);
   const capsule = new THREE.CapsuleGeometry(1, 1, 8, 16);
@@ -291,6 +298,7 @@ function createWorld() {
   let bodyLean = 0;
   let roomNight = 0;
   let roomPeach = 0;
+  let trainingLift = 0;
   const daylightColor = new THREE.Color(0xffedd4);
   const moonlightColor = new THREE.Color(0xc7d7ee);
   const sunsetColor = new THREE.Color(0xffc8a0);
@@ -329,7 +337,7 @@ function createWorld() {
       const direction = action.target.clone().sub(dog.position);direction.y = 0;direction.normalize();
       action.fetchPoint = action.target.clone().addScaledVector(direction, -.85);action.fetchPoint.y = 0;
     }
-    if (stageLabel) stageLabel.textContent = ({ stroke: '小黑在蹭蹭你', feed: '小黑正在吃东西', play: '小黑去追球啦' })[kind] || '小黑在散步';
+    if (stageLabel) stageLabel.textContent = ({ stroke: '小黑在蹭蹭你', feed: '小黑正在吃东西', play: '小黑去追球啦', train: '小黑伸出小爪爪' })[kind] || '小黑在散步';
     return new Promise((resolve) => { pending = resolve; });
   }
   function walk(from, to, u) {
@@ -368,13 +376,14 @@ function createWorld() {
     turnTarget = 0;
     previousPosition.copy(dog.position);
     elapsed += dt;
-    if (action) action.time += dt;
+    if (action) action.time += dt * (action.kind === 'play' && action.gentle ? .75 : 1);
     sleepBlend = THREE.MathUtils.damp(sleepBlend, sleepTarget ? 1 : 0, 3, dt);
     let gait = 0;
     let crouch = 0;
     let nuzzle = 0;
     let feeding = 0;
     let carrying = false;
+    let trainRaise = 0;
     let excitement = .3;
     let targetSit = 1;
     if (!sleepTarget && action) {
@@ -384,6 +393,18 @@ function createWorld() {
         excitement = 1;
         stepAt(.2, 'happy', () => emit('sound', { kind: 'happy' }));
         if (t > 1.45) finish();
+      } else if (action.kind === 'train') {
+        // A real front-leg reach, with both joints following the target paw.
+        // The held pose gives the visitor time to see the handshake land.
+        if (t < .45) walk(action.start, home, t / .45);
+        currentYaw += clamp(wrapAngle(.32 - currentYaw) * (1 - Math.exp(-9 * dt)), -3.8 * dt, 3.8 * dt);
+        trainRaise = smooth((t - .35) / .35) * (1 - smooth((t - 1.55) / .45));
+        excitement = 1;
+        nuzzle = trainRaise * .25;
+        stepAt(.48, 'paw', () => announce('小爪爪伸出来啦，握住宝宝的手。'));
+        stepAt(.85, 'happy', () => emit('sound', { kind: 'happy' }));
+        stepAt(1.6, 'learned', () => announce(action.quality === 'perfect' ? '刚刚好！小狗记住了和宝宝的默契。' : '握到啦，下一次也想把小爪爪给你。'));
+        if (t > 2.25) finish();
       } else if (action.kind === 'feed') {
         excitement = .45;targetSit = 0;
         if (t < 1.1) { walk(action.start, action.target, t / 1.1);gait = .6; }
@@ -436,7 +457,7 @@ function createWorld() {
     }
     if (!action && !sleepTarget) {
       currentYaw += clamp(wrapAngle(.32 - currentYaw) * (1 - Math.exp(-4 * dt)), -3.8 * dt, 3.8 * dt);
-      if (!reduce.matches && elapsed > nextWander && !grab) {
+      if (visible && !reduce.matches && elapsed > nextWander && !grab) {
         nextWander = elapsed + 15 + random() * 9;
         void begin('wander', { target: V((random() - .5) * 1.25, 0, -.2 - random() * .3) });
       }
@@ -452,6 +473,7 @@ function createWorld() {
       pose[name] = THREE.MathUtils.damp(pose[name], target, name === 'feeding' ? 12 : 9, dt);
     }
     crouch = pose.crouch;nuzzle = pose.nuzzle;feeding = pose.feeding;excitement = pose.excitement;
+    trainingLift = THREE.MathUtils.damp(trainingLift, sleepTarget ? 0 : trainRaise, 12, dt);
     sitBlend = THREE.MathUtils.damp(sitBlend, targetSit, 5, dt);
     const breath = reduce.matches ? 0 : Math.sin(elapsed * 2.1) * .009;
     phase += reduce.matches ? 0 : distance / .46 * Math.PI * 2;
@@ -468,7 +490,7 @@ function createWorld() {
     const pointerYaw = pointer.active ? pointer.x * .55 : reduce.matches ? 0 : Math.sin(elapsed * .43) * .07;
     head.rotation.y = THREE.MathUtils.damp(head.rotation.y, (pointerYaw - (gait > .1 ? 0 : wrapAngle(currentYaw) * .35) + clamp(turnTarget * .16, -.25, .25)) * (1 - sleepBlend), 6, dt);
     head.rotation.x = THREE.MathUtils.damp(head.rotation.x, crouch * .74 + sleepBlend * .10 + (pointer.active ? pointer.y * .15 : 0) + nuzzle * (action?.zone === 'chin' ? -.25 : -.12), 10, dt);
-    head.rotation.z = THREE.MathUtils.damp(head.rotation.z, nuzzle * (action?.zone === 'ear' ? -.20 : .13) + (reduce.matches ? 0 : Math.sin(elapsed * .67) * .025) * (1 - sleepBlend), 10, dt);
+    head.rotation.z = THREE.MathUtils.damp(head.rotation.z, nuzzle * (action?.zone === 'ear' ? -.20 : .13) - trainingLift * .12 + (reduce.matches ? 0 : Math.sin(elapsed * .67) * .025) * (1 - sleepBlend), 10, dt);
     collar.position.y = 1.38 - sleepBlend * .77 - crouch * .49;
     bib.position.y = 1.34 - sleepBlend * .76 - crouch * .47;
     knot.position.y = 1.38 - sleepBlend * .77 - crouch * .49;
@@ -482,7 +504,8 @@ function createWorld() {
       const swing = clamp((cycle - .62) / .38, 0, 1);
       const step = stance ? mix(.16, -.16, cycle / .62) : mix(-.16, .16, easeSwing(swing));
       const lift = stance ? 0 : Math.sin(Math.PI * swing) ** 2 * mix(.085, .13, runBlend);
-      moveLeg(leg, step * gait, lift * gait, crouch, sleepBlend);
+      const handshake = leg.front && leg.side === 1 ? trainingLift : 0;
+      moveLeg(leg, step * gait + handshake * .38, lift * gait + handshake * .46, crouch, sleepBlend);
     }
     if (!reduce.matches && elapsed > nextBlink) { blinkStart = elapsed;nextBlink = elapsed + 2.8 + random() * 3; }
     const blink = clamp(Math.sin(clamp((elapsed - blinkStart) / .24, 0, 1) * Math.PI), 0, 1);
@@ -541,7 +564,14 @@ function createWorld() {
     previousDraw = time;
     const dt = previousTime ? Math.min((time - previousTime) / 1000, .05) : .016;
     previousTime = time;
-    if (visible && !document.hidden) { update(dt);renderer.render(scene, camera); }
+    // A care button can be below the room on a phone. Finish its interaction
+    // even when scrolling hides the canvas, while skipping the costly draw.
+    const poseTransition = Math.abs(sleepBlend - (sleepTarget ? 1 : 0)) > .001 || trainingLift > .001;
+    const activeCare = action && action.kind !== 'wander';
+    if (!document.hidden && (visible || activeCare || poseTransition)) {
+      update(dt);
+      if (visible) renderer.render(scene, camera);
+    }
     activeFrame = requestAnimationFrame(frame);
   }
   const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting;previousTime = 0; });
@@ -608,9 +638,16 @@ function createWorld() {
       if (reduce.matches) { emit('sound', { kind: kind === 'feed' ? 'crunch' : 'happy' });return Promise.resolve(true); }
       return begin(kind, options);
     },
+    setScarf(id) {
+      if (typeof id !== 'string' || !Object.prototype.hasOwnProperty.call(scarfPalette, id)) return false;
+      scarfId = id;
+      scarf.color.setHex(scarfPalette[id][0]);
+      scarfLight.color.setHex(scarfPalette[id][1]);
+      return true;
+    },
     sleep(value) { if (value === sleepTarget) return;finish(false);sleepTarget = value;draggingBall = false;grab = null;nextWander = elapsed + 8;if (stageLabel) stageLabel.textContent = value ? '小狗在做梦' : '会动的小黑 · 可以摸摸它'; },
     cancel() { finish(false);draggingBall = false;ball.position.copy(ballHome); },
-    inspect() { return { state: sleepTarget ? 'sleeping' : action?.kind || 'idle', time: elapsed, phase: action?.time || 0, position: dog.position.toArray(), yaw: currentYaw, speed: travelSpeed, gait: gaitBlend, pawHeights: legs.map((leg) => leg.paw.getWorldPosition(V()).y), head: head.rotation.toArray().slice(0, 3), headScreen: head.getWorldPosition(V()).project(camera).toArray(), tail: tail[0].rotation.y, leg: legs[0].upper.rotation.x, ball: ball.position.toArray(), mouth: head.localToWorld(V(0, -.22, .68)).toArray(), eyes: eyes[0].scale.y, framesPaused: !visible || document.hidden, reducedMotion: reduce.matches }; },
+    inspect() { return { state: sleepTarget ? 'sleeping' : action?.kind || 'idle', time: elapsed, phase: action?.time || 0, position: dog.position.toArray(), yaw: currentYaw, speed: travelSpeed, gait: gaitBlend, pawHeights: legs.map((leg) => leg.paw.getWorldPosition(V()).y), trainingLift, trainingPawScreen: legs[1].paw.getWorldPosition(V()).project(camera).toArray(), scarf: scarfId, scarfColor: scarfLight.color.getHexString(), head: head.rotation.toArray().slice(0, 3), headScreen: head.getWorldPosition(V()).project(camera).toArray(), tail: tail[0].rotation.y, leg: legs[0].upper.rotation.x, ball: ball.position.toArray(), mouth: head.localToWorld(V(0, -.22, .68)).toArray(), eyes: eyes[0].scale.y, framesPaused: !visible || document.hidden, reducedMotion: reduce.matches }; },
   };
   renderer.domElement.addEventListener('webglcontextlost', (event) => {
     event.preventDefault();finish(false);room.classList.remove('has-live-dog');emit('unavailable', {});

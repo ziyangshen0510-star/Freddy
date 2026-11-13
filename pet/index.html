@@ -13,12 +13,15 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="preload" href="./puppy-awake.png" as="image">
-  <link rel="stylesheet" href="../styles.css?v=6">
-  <link rel="stylesheet" href="./pet.css?v=6">
-  <link rel="stylesheet" href="./room-style.css?v=6">
-  <script src="./pet.js?v=6" defer></script>
-  <script src="./room-style.js?v=6" defer></script>
-  <script src="./puppy-world.bundle.js?v=6" defer></script>
+  <link rel="stylesheet" href="../styles.css?v=7">
+  <link rel="stylesheet" href="./pet.css?v=7">
+  <link rel="stylesheet" href="./room-style.css?v=7">
+  <link rel="stylesheet" href="./journey.css?v=7">
+  <script src="./journey.js?v=7" defer></script>
+  <script src="./journey-ui.js?v=7" defer></script>
+  <script src="./pet.js?v=7" defer></script>
+  <script src="./room-style.js?v=7" defer></script>
+  <script src="./puppy-world.bundle.js?v=7" defer></script>
 </head>
 <body class="pet-page">
   <div class="page-grain" aria-hidden="true"></div>
@@ -60,14 +63,32 @@
           </button>
           <button type="button" class="room-bowl" id="food-bowl" aria-label="喂小黑吃东西" title="点击喂食"><span>小黑</span></button>
           <button type="button" class="room-ball" id="toy-ball" aria-label="抛球给小黑" title="拖动或点击抛球"></button><span class="room-snack" aria-hidden="true">✦</span>
+          <div class="training-game" id="training-game" hidden>
+            <div class="training-game-heading"><span>把小爪爪，接进手心</span><button type="button" id="training-cancel" aria-label="取消握手练习">×</button></div>
+            <p id="training-instruction">光点走进绿色时，伸出你的手。慢一点也没关系。</p>
+            <div class="training-timing" aria-hidden="true"><span class="training-target"></span><span id="training-marker"></span></div>
+            <button type="button" id="training-hand">伸出手，握一握</button>
+          </div>
+          <div class="interaction-reward" id="interaction-reward" hidden aria-hidden="true"></div>
           <div class="pet-hearts" id="pet-hearts" aria-hidden="true"></div>
           <span class="room-bottom-note" id="room-bottom-note">点点小狗，也可以摸摸它哦</span>
         </section>
         <div class="room-caption"><span><span class="caption-dot" aria-hidden="true"></span><span id="room-style-caption">薄荷小窝 · 编织地毯</span></span><button type="button" id="room-style-shortcut" aria-haspopup="dialog" aria-controls="room-decor-dialog">换个心情 <span aria-hidden="true">↗</span></button></div>
+        <section class="daily-card" aria-labelledby="daily-heading">
+          <div class="daily-heading"><div><span class="pet-eyebrow">A LITTLE SOMETHING, TOGETHER</span><h2 id="daily-heading">今天，想和你一起</h2></div><span class="daily-count" id="daily-count">0 / 3</span></div>
+          <div id="daily-tasks" class="daily-tasks"></div>
+          <button type="button" id="daily-gift" disabled><span aria-hidden="true">✧</span><span id="daily-gift-label">实现 3 个小心愿，拆一份小惊喜</span><span aria-hidden="true">↗</span></button>
+          <p class="daily-note" id="daily-note">小心愿每天换新，攒下的默契一直都在。</p>
+        </section>
         <div class="room-note"><svg viewBox="0 0 48 64" aria-hidden="true"><path d="M21 58c7-16 5-31 7-49M25 39C9 40 7 29 8 24c12 0 18 6 17 15ZM27 28c-1-13 8-19 15-19 2 11-5 18-15 19ZM26 50c1-11 7-16 14-15 0 10-6 15-14 15Z"/></svg><div><strong>小小的陪伴，刚刚好的幸福。</strong><p>不必特意做什么，你在，就是很好的事情。</p></div><span class="room-note-flower" aria-hidden="true">✽</span></div>
       </div>
       <section class="pet-controls" aria-label="照顾小狗">
         <div class="pet-profile"><div><span class="pet-eyebrow">YOUR LITTLE COMPANION</span><h2><span id="pet-name">小黑</span><button class="rename-button" id="rename-button" aria-label="给小狗改名字" title="给小狗改名字"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M5 19l1-5L16 4a2.8 2.8 0 0 1 4 4L10 18l-5 1ZM13 20h7"/></svg></button></h2><p id="pet-description">一只喜欢宝宝的黑色拉布拉多</p></div><div class="bond-badge"><span aria-hidden="true">♡</span><small id="bond-label">初见也欢喜</small></div></div>
+        <div class="journey-growth">
+          <div class="journey-growth-heading"><span class="journey-level-pill">Lv. <strong id="journey-level">1</strong></span><strong id="journey-level-label">初见的朋友</strong><button type="button" id="journey-album-open" aria-haspopup="dialog" aria-controls="journey-album">成长纪念册 <span aria-hidden="true">↗</span></button></div>
+          <div class="journey-progress-label"><span>我们的小默契</span><span id="journey-xp">0 / 40</span></div>
+          <div class="journey-progress" id="journey-progress" role="progressbar" aria-label="亲密成长" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><span></span></div>
+        </div>
         <div class="care-section-heading"><h3>把小小的它，照顾好</h3><span id="care-hint">现在的它，心情很好</span></div>
         <div class="pet-stats" aria-label="小狗的状态">
           <div class="pet-stat"><div><span>饱饱</span><span id="hunger-label">80%</span></div><div class="stat-meter" role="meter" aria-label="饱腹度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="80" id="hunger-meter"><span></span></div></div>
@@ -80,6 +101,8 @@
           <button class="pet-action" id="action-play"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="10"/><path d="M9 9c8 0 14 6 14 14M6 17c6 1 10-4 10-11m0 20c0-6 5-10 10-10"/></svg></span><strong>玩球</strong><small>快乐蹦蹦跳</small></button>
           <button class="pet-action" id="action-sleep" aria-pressed="false"><span class="action-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M23 21A11 11 0 0 1 12 7a11 11 0 1 0 11 14Z"/><path d="m23 6 1 3 3 1-3 1-1 3-1-3-3-1 3-1Z"/></svg></span><strong id="sleep-action-label">睡觉</strong><small id="sleep-action-hint">做个甜甜的梦</small></button>
         </div>
+        <button type="button" id="training-start" class="training-launch" aria-controls="training-game"><span class="training-paw" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M10 18c-6 7-3 12 2 10 3-1 5-1 8 0 5 2 8-3 2-10-4-5-8-5-12 0Z"/><ellipse cx="6" cy="12" rx="3" ry="4" transform="rotate(-25 6 12)"/><ellipse cx="13" cy="7" rx="3" ry="4"/><ellipse cx="21" cy="7" rx="3" ry="4"/><ellipse cx="27" cy="13" rx="3" ry="4" transform="rotate(25 27 13)"/></svg></span><span class="training-launch-copy"><strong>握手小课堂 <span id="training-label">初次伸爪</span></strong><small id="training-progress">把手给它，慢慢练出小默契</small></span><span class="training-launch-arrow" aria-hidden="true">↗</span></button>
+        <p class="journey-feedback" id="journey-feedback" role="status">每次认真相处，都在积攒小默契。</p>
         <div class="companionship"><span class="companionship-icon" aria-hidden="true">✽</span><div><strong id="affection-heading">今天，也是被喜欢的小狗。</strong><p id="affection-copy">不需要打卡，有空来看看就很好。</p></div><span class="companionship-heart" aria-hidden="true">♡</span></div>
         <div class="pet-memory"><div class="memory-heading"><div><span class="pet-eyebrow">OUR LITTLE MOMENTS</span><h3>相处的小事</h3></div><button type="button" id="memory-toggle" aria-expanded="false" aria-controls="memory-list" hidden>多看一点 <span aria-hidden="true">↗</span></button></div><div id="memory-list" aria-label="最近的陪伴记录"></div></div>
       </section>
@@ -91,6 +114,15 @@
     <button type="button" class="dialog-close" id="dialog-close" aria-label="关闭">×</button><span class="pet-eyebrow">OUR LITTLE HOME</span><h2 id="dialog-heading">给小狗一个名字</h2>
     <form id="rename-form"><label for="pet-name-input">宝宝想叫它什么呢？</label><div class="rename-row"><input id="pet-name-input" name="pet-name" maxlength="24" autocomplete="off" required placeholder="小黑" aria-describedby="name-help"><button class="button button-primary" type="submit">就叫这个</button></div><small id="name-help">取一个喜欢的名字，最多 12 个字。</small></form>
     <div class="install-help"><h3>把小狗放到手机桌面</h3><p>iPhone：用 Safari 打开，点「分享」，选择「添加到主屏幕」。</p><p>Android：用 Chrome 打开，在菜单里选择「安装应用」或「添加到主屏幕」。</p><small>联网打开一次，准备好离线模式后，就能像小 App 一样独立打开。</small></div><div class="data-note">小狗的状态只保存在当前浏览器。清除网站数据或换设备会重新开始，卸载浏览器前记得这一点哦。</div>
+  </dialog>
+  <dialog class="journey-dialog" id="journey-album" aria-labelledby="journey-album-heading">
+    <button type="button" class="journey-dialog-close" id="journey-album-close" aria-label="关闭成长纪念册">×</button>
+    <span class="pet-eyebrow">LOOK HOW FAR WE HAVE COME</span><h2 id="journey-album-heading">我们，慢慢变熟的证据</h2><p class="journey-dialog-subtitle" id="journey-album-summary">每一次小互动，都被好好记住了。</p><p class="journey-save-warning" id="journey-album-warning" role="status" hidden>当前浏览器无法保存。这次选择先留在当前页面，关闭后可能恢复。</p>
+    <h3>属于我们的纪念章 <span id="badge-count">0 / 8</span></h3><div class="journey-badges" id="journey-badges"></div>
+    <h3>小狗的领巾衣橱</h3><p class="wardrobe-note" id="wardrobe-note">第一份心愿礼物，藏着一条蜜桃领巾。</p><div class="journey-wardrobe" id="journey-wardrobe"></div>
+  </dialog>
+  <dialog class="journey-dialog daily-gift-dialog" id="daily-gift-dialog" aria-labelledby="daily-gift-heading">
+    <span class="pet-eyebrow">A LITTLE GIFT FROM YOUR LITTLE FRIEND</span><div class="gift-illustration" id="gift-illustration" aria-hidden="true"><span></span>✧</div><h2 id="daily-gift-heading">今天的喜欢，收好啦</h2><p id="daily-gift-description"></p><p class="journey-save-warning" id="daily-gift-save-warning" role="status" hidden>当前浏览器无法保存。这份礼物先留在当前页面，关闭后可能恢复。</p><p class="gift-next" id="gift-next"></p><button type="button" id="daily-gift-close">带着新默契，继续玩</button>
   </dialog>
   <div class="toast" id="toast" role="status" hidden></div>
 </body>

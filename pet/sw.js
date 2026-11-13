@@ -1,8 +1,8 @@
 'use strict';
 
-const CACHE = 'kali-little-dog-v6';
+const CACHE = 'kali-little-dog-v7';
 // Resolve relative to the worker so hosting under a GitHub Pages subpath works.
-const ASSETS = ['./', './index.html', './pet.css?v=6', './room-style.css?v=6', './pet.js?v=6', './room-style.js?v=6', './puppy-world.bundle.js?v=6', './manifest.webmanifest', './icon-192.png', './icon-512.png', './puppy-awake.png', './puppy-asleep.png', '../styles.css?v=6', '../assets/paw.svg'].map((url) => new URL(url, self.location.href).href);
+const ASSETS = ['./', './index.html', './pet.css?v=7', './room-style.css?v=7', './pet.js?v=7', './journey.js?v=7', './journey-ui.js?v=7', './journey.css?v=7', './room-style.js?v=7', './puppy-world.bundle.js?v=7', './manifest.webmanifest', './icon-192.png', './icon-512.png', './puppy-awake.png', './puppy-asleep.png', '../styles.css?v=7', '../assets/paw.svg'].map((url) => new URL(url, self.location.href).href);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS.map((url) => new Request(url, { cache: 'reload' })))).then(() => self.skipWaiting()));

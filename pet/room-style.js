@@ -118,8 +118,9 @@
     dialog.close('saved');
     room.dispatchEvent(new CustomEvent('room:style-saved', { detail: { ...saved, persisted }, bubbles: true }));
   });
-  dialog.querySelector('.room-decor-cancel').addEventListener('click', () => { dialog.close('cancelled'); });
-  dialog.querySelector('.room-decor-close').addEventListener('click', () => { dialog.close('cancelled'); });
+  function cancelDecor() { apply(saved); dialog.close('cancelled'); }
+  dialog.querySelector('.room-decor-cancel').addEventListener('click', cancelDecor);
+  dialog.querySelector('.room-decor-close').addEventListener('click', cancelDecor);
   // Revert Escape's preview immediately, before the native close event is queued.
   dialog.addEventListener('cancel', () => { apply(saved); });
   dialog.addEventListener('close', restore);
@@ -130,7 +131,7 @@
   }
   dialog.addEventListener('pointerdown', (event) => { backdropPress = event.target === dialog && outside(event); });
   dialog.addEventListener('click', (event) => {
-    if (backdropPress && event.target === dialog && outside(event)) dialog.close('cancelled');
+    if (backdropPress && event.target === dialog && outside(event)) cancelDecor();
     backdropPress = false;
   });
 })();
